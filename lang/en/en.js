@@ -506,5 +506,8 @@ UE.I18N['en'] = {
             listBackgroundURL:'',
             buttonURL:'button.png'
         }
+    },
+    'formula':{
+
     }
 };

@@ -275,3 +275,8 @@
     width: 225px;
     height: 60px;
 }
+/*formula-dialog*/
+.edui-default .edui-for-formula .edui-dialog-content {
+    width: 1054px;
+    height: 500px;
+}
