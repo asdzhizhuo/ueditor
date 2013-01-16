@@ -5,8 +5,8 @@
  * Time: 下午5:56
  * To change this template use File | Settings | File Templates.
  */
-var layoutWrap = document.getElementById('layout-wrap'),
-    textEditor = document.getElementById('textarea'),
+var layoutWrap = $G('layout-wrap'),
+    textEditor = $G('textarea'),
     bk;
 
 textEditor.focus();
@@ -35,6 +35,7 @@ layoutWrap.onclick = function (e) {
         updateFormula(textEditor.value);
     }
 };
+
 function updateFormula(text) {
     var tmr = arguments.callee.tmr;
 
@@ -45,10 +46,11 @@ function updateFormula(text) {
 
 }
 function getPos() {
-    var start, end;
-    var range = document.selection.createRange();
-    var range_all = document.body.createTextRange();
-    var textBox = document.getElementById('textarea');
+    var start, end, doc = document;
+    var range = doc.selection.createRange();
+    var range_all = doc.body.createTextRange();
+    var textBox = $G('textarea');
+
     range_all.moveToElementText(textBox);
     for (start = 0; range_all.compareEndPoints("StartToStart", range) < 0; start++)
         range_all.moveStart('character', 1);
@@ -56,7 +58,7 @@ function getPos() {
         if (textBox.value.charAt(i) == '\n')
             start++;
     }
-    var range_all = document.body.createTextRange();
+    range_all = doc.body.createTextRange();
     range_all.moveToElementText(textBox);
 
     for (end = 0; range_all.compareEndPoints('StartToEnd', range) < 0; end++)
@@ -77,10 +79,11 @@ if (state) {
     textEditor.value = decodeURIComponent(ele.getAttribute('data'));
     updateFormula(textEditor.value)
 }
+
 dialog.onok = function () {
     var textValue = textEditor.value.replace(/(^\s*)|(\s*$)/g, '');
     if (textValue.length > 0) {
-        var mathjaxDom = document.getElementById('result-area').lastChild;
+        var mathjaxDom = $G('result-area').lastChild;
         do {
             mathjaxDom = mathjaxDom.previousSibling;
         }
@@ -103,4 +106,4 @@ dialog.onok = function () {
             (editor.document.defaultView || editor.document.parentWindow).MathJax.Hub.getJaxFor(ele.lastChild).Text(textValue);
         }
     }
-}
+};
