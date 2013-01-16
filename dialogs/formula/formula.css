@@ -1,0 +1,58 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    background-color: #C6DDFA;
+}
+
+#layout-wrap {
+    height: 320px;
+}
+
+td {
+    border: 1px solid #638EE6;
+}
+
+.symbol {
+    margin: 10px;
+}
+
+#layout-wrap .symbol table {
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+.symbol td {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    cursor: default;
+}
+
+#textarea {
+    width: 100%;
+    border: 0;
+    overflow: auto;
+}
+
+.sym1 {
+    background: url(img/img.gif) no-repeat;
+}
+
+.sym2 {
+    background: url(img/img.gif) 0 -64px no-repeat;
+}
+
+.sym3 {
+    background: url(img/img.gif) 0 -96px no-repeat;
+}
+
+.sym4 {
+    background: url(img/img.gif) 0 -128px no-repeat;
+}
+
+.sym5 {
+    background: url(img/cmd.gif) no-repeat;
+}
