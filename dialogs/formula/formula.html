@@ -4,7 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>插入公式</title>
   <script type="text/javascript" src="../internal.js"></script>
-  <script type="text/javascript" src="../../third-party/MathJax/MathJax.js?config=TeX-AMS_HTML"></script>
+  <script type="text/javascript" src="../../third-party/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <style type="text/css">
 	*{margin:0;padding:0;}
 	table{background-color:#C6DDFA;}
@@ -221,16 +221,15 @@
 	<script type="text/javascript">
 		var layoutWrap = document.getElementById('layout-wrap'),
 			textEditor = document.getElementById('textarea'),
-			bk,
-            domUtils = parent.baidu.editor.dom.domUtils;
+			bk;
 
         textEditor.focus();
 		textEditor.onmouseup = function (){
 			document.selection && (bk = document.selection.createRange().getBookmark());
-		}
+		};
 		textEditor.onkeyup = function (){
 			updateFormula.call(this, this.value);
-		}
+		};
 		layoutWrap.onclick = function (e){
 			var e = e || window.event,
 				target = e.target||e.srcElement,
@@ -250,7 +249,7 @@
 				textEditor.value = textEditor.value.slice(0, posStart) + signal + textEditor.value.slice(posEnd);
 				updateFormula(textEditor.value);
 			}
-		}
+		};
 		function updateFormula(text){
 			var tmr = arguments.callee.tmr;
 
