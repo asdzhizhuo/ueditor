@@ -5,37 +5,170 @@
 ///commandsTitle  插入公式
 ///commandsDialog  dialogs\formula\formula.html
 
-UE.plugins['insertformula'] = function() {
-	var me = this;
-	this.commands['insertformula'] = {
-		execCommand: function (cmdName, texStr){
-			texStr.length>0 && (this.execCommand('inserthtml', texStr));
-		},
-		queryCommandState: function (){
-			var range = this.selection.getRange(),start,end;
-			range.adjustmentBoundary();
-			start = domUtils.findParent(range.startContainer,function(node){
-				return node.nodeType == 1 && node.tagName == 'DIV' && domUtils.hasClass(node,'MathJax_Display')
-			},true);
-			end = domUtils.findParent(range.endContainer,function(node){
-				return node.nodeType == 1 && node.tagName == 'DIV' && domUtils.hasClass(node,'MathJax_Display')
-			},true);
-			return start && end && start == end  ? 1 : 0;
-		}
-	};
-	me.addListener("ready",function(){
-		if(!window.MathJax){
-			var script = me.document.createElement("script");
-			script.type = "text/javascript";
-			script.src  = "../third-party/MathJax/MathJax.js?config=TeX-AMS_HTML";
-
-			var config = 'MathJax.Hub.Startup.onload();';
-
-			if (window.opera) {script.innerHTML = config}
-				   else {script.text = config}
-
-			me.document.getElementsByTagName("head")[0].appendChild(script);
+UE.plugins['insertformula'] = function () {
+    var me = this;
+    me.commands['insertformula'] = {
+        execCommand:function (cmdName, texStr) {
+            if (texStr.length > 0) {
+                me.execCommand('inserthtml', texStr);
+                me.execCommand('inserthtml', "<p></p>");
+            }
+        },
+        queryCommandState:function () {
+            return queryState.call(this);
         }
-	});
+    };
+    function queryState() {
+        try {
+            var range = this.selection.getRange(), start, end;
+            range.adjustmentBoundary();
+            start = domUtils.findParent(range.startContainer, function (node) {
+                return node.nodeType == 1 && node.tagName == 'DIV' && domUtils.hasClass(node, 'MathJax_Display')
+            }, true);
+            end = domUtils.findParent(range.endContainer, function (node) {
+                return node.nodeType == 1 && node.tagName == 'DIV' && domUtils.hasClass(node, 'MathJax_Display')
+            }, true);
+            return start && end && start == end ? 1 : 0;
+        }
+        catch (e) {
+            return 0;
+        }
+    }
 
+    //不需要判断highlight的command列表
+    me.notNeedHighlightQuery = {
+        help:1,
+        undo:1,
+        redo:1,
+        source:1,
+        print:1,
+        searchreplace:1,
+        fullscreen:1,
+        autotypeset:1,
+        pasteplain:1,
+        preview:1,
+        insertparagraph:1,
+        elementpath:1
+    };
+    //将queyCommamndState重置
+    var orgQuery = me.queryCommandState;
+    me.queryCommandState = function (cmd) {
+        if (!me.notNeedHighlightQuery[cmd.toLowerCase()] && queryState.call(this) == 1) {
+            return -1;
+        }
+        return orgQuery.apply(this, arguments)
+    };
+    me.addListener("ready", function () {
+        if (!window.MathJax) {
+            utils.loadFile(me.document, {
+                src:me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + "third-party/MathJax/MathJax.js?config=TeX-AMS_HTML",
+                tag:"script",
+                type:"text/javascript",
+                defer:"defer"
+            });
+        }
+    });
+
+    me.addListener('beforeselectionchange afterselectionchange', function (type) {
+        me.formula = /^b/.test(type) ? me.queryCommandState('insertformula') : 0;
+    });
+    function getEleByClsName(cxt, clsName) {
+        var doc = cxt;
+        if (!doc.getElementsByClassName) {
+            var clsArr = [];
+            var reg = new RegExp("\\b" + clsName + "\\b");
+            var eleArr = doc.getElementsByTagName("*");
+            for (var i = 0, eleobj; eleobj = eleArr[i++];) {
+                if (reg.test(eleobj.className))
+                    clsArr.push(eleobj);
+            }
+            return clsArr;
+        }
+        else {
+            return doc.getElementsByClassName(clsName);
+        }
+    }
+
+    me.addListener("beforegetcontent beforegetscene", function () {
+        var list = getEleByClsName(this.document, 'math-container');
+        if (list.length) {
+            utils.each(list, function (di) {
+                var str = [];
+                var span = di.cloneNode(false);
+
+                str.push(decodeURIComponent(di.getAttribute('data')));
+                span.appendChild(me.document.createTextNode(str.join('\n')));
+                di.parentNode.replaceChild(span, di);
+            });
+        }
+    });
+
+
+    me.addListener("aftergetcontent aftersetcontent aftergetscene", function () {
+        var me = this;
+        var list = getEleByClsName(me.document, 'math-container');
+
+        if (list.length) {
+            utils.each(list, function (pi) {
+                var first = pi.firstChild;
+                while (first && first.nodeType == 1 && !dtd.$empty[first.tagName]) {
+                    if (domUtils.isBookmarkNode(first)) {
+                        first = first.nextSibling;
+                        continue;
+                    }
+                    first = first.firstChild;
+                }
+                if (first.nodeType == 3) {
+                    first.nodeValue = "$$" + decodeURIComponent(pi.getAttribute('data')) + "$$";
+                }
+                me.window.MathJax.Hub.Typeset(pi);
+            });
+        }
+    });
+
+
+    //避免table插件对于代码高亮的影响
+    me.addListener('excludetable excludeNodeinautotype', function (cmd, target) {
+        if (target && domUtils.findParent(target, function (node) {
+            return node.tagName == '' && domUtils.hasClass(node, 'syntaxhighlighter');
+        }, true)) {
+            return true;
+        }
+    });
+
+    me.addListener('getAllHtml', function (type, headHtml) {
+        var coreHtml = '';
+        for (var i = 0, ci, divs = domUtils.getElementsByTagName(me.document, 'table'); ci = divs[i++];) {
+            if (domUtils.hasClass(ci, 'syntaxhighlighter')) {
+                coreHtml = '<script type="text/javascript">window.onload = function(){SyntaxHighlighter.highlight();' +
+                    'setTimeout(function(){ ' +
+                    "   var tables = document.getElementsByTagName('table');" +
+                    "   for(var t= 0,ti;ti=tables[t++];){" +
+                    "       if(/SyntaxHighlighter/i.test(ti.className)){" +
+                    "           var tds = ti.getElementsByTagName('td');" +
+                    "           for(var i=0,li,ri;li=tds[0].childNodes[i];i++){" +
+                    "               ri = tds[1].firstChild.childNodes[i];" +
+                    "               if(ri){" +
+                    "                  ri.style.height = li.style.height = ri.offsetHeight + 'px';" +
+                    "               }" +
+                    "           }" +
+                    "       }" +
+                    "   }" +
+                    '},100)' +
+                    '}</script>'
+                break;
+            }
+        }
+        if (!coreHtml) {
+            var tmpNode;
+            if (tmpNode = me.document.getElementById('syntaxhighlighter_css')) {
+                domUtils.remove(tmpNode)
+            }
+            if (tmpNode = me.document.getElementById('syntaxhighlighter_js')) {
+                domUtils.remove(tmpNode)
+
+            }
+        }
+        coreHtml && headHtml.push(coreHtml)
+    });
 };

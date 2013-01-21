@@ -90,7 +90,7 @@ dialog.onok = function () {
         while (mathjaxDom && mathjaxDom.className != 'MathJax_Display');
 
         if (state == 0) {
-            editor.execCommand('insertFormula', '<span id="math-container-id" class="math-container" data="' + encodeURIComponent(textValue) + '">$$' + textValue + '$$</span>');
+            editor.execCommand('insertFormula', '<span class="math-container" data="' + encodeURIComponent(textValue) + '">$$' + textValue + '$$</span>');
             var ele = editor.selection.getRange().startContainer,
                 ele = domUtils.findParent(ele, function (node) {
                     return node.nodeType === 1;
