@@ -253,7 +253,7 @@
 
         //formula
         // 数学公式时需要加载的第三方插件的路径
-        // ,formulaJsUrl:URL + "third-party/MathJax/MathJax.js?config=TeX-AMS_HTML"
+        // ,formulaJsUrl:URL + "third-party/MathJax/MathJax.js?config=default"
 
         //tab
         //点击tab键时移动的距离,tabSize倍数，tabNode什么字符做为单位

@@ -11,7 +11,6 @@ UE.plugins['insertformula'] = function () {
         execCommand:function (cmdName, texStr) {
             if (texStr.length > 0) {
                 me.execCommand('inserthtml', texStr);
-                me.execCommand('insertparagraph');
             }
         },
         queryCommandState:function () {
@@ -61,7 +60,7 @@ UE.plugins['insertformula'] = function () {
     me.addListener("ready", function () {
         if (!window.MathJax) {
             utils.loadFile(me.document, {
-                src:me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + "third-party/MathJax/MathJax.js?config=TeX-AMS_HTML",
+                src:me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + "third-party/MathJax/MathJax.js?config=default",
                 tag:"script",
                 type:"text/javascript",
                 defer:"defer"
