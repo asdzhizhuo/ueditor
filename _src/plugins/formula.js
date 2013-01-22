@@ -11,7 +11,7 @@ UE.plugins['insertformula'] = function () {
         execCommand:function (cmdName, texStr) {
             if (texStr.length > 0) {
                 me.execCommand('inserthtml', texStr);
-                me.execCommand('inserthtml', "<p></p>");
+                me.execCommand('insertparagraph');
             }
         },
         queryCommandState:function () {
@@ -73,11 +73,10 @@ UE.plugins['insertformula'] = function () {
         me.formula = /^b/.test(type) ? me.queryCommandState('insertformula') : 0;
     });
     function getEleByClsName(cxt, clsName) {
-        var doc = cxt;
-        if (!doc.getElementsByClassName) {
+        if (!cxt.getElementsByClassName) {
             var clsArr = [];
             var reg = new RegExp("\\b" + clsName + "\\b");
-            var eleArr = doc.getElementsByTagName("*");
+            var eleArr = cxt.getElementsByTagName("*");
             for (var i = 0, eleobj; eleobj = eleArr[i++];) {
                 if (reg.test(eleobj.className))
                     clsArr.push(eleobj);
@@ -85,90 +84,91 @@ UE.plugins['insertformula'] = function () {
             return clsArr;
         }
         else {
-            return doc.getElementsByClassName(clsName);
+            return cxt.getElementsByClassName(clsName);
         }
     }
 
     me.addListener("beforegetcontent beforegetscene", function () {
-        var list = getEleByClsName(this.document, 'math-container');
-        if (list.length) {
-            utils.each(list, function (di) {
-                var str = [];
-                var span = di.cloneNode(false);
-
-                str.push(decodeURIComponent(di.getAttribute('data')));
-                span.appendChild(me.document.createTextNode(str.join('\n')));
-                di.parentNode.replaceChild(span, di);
-            });
-        }
+//        var list = getEleByClsName(this.document, 'math-container');
+//        if (list.length) {
+//            utils.each(list, function (di) {
+//                var str = [];
+//                var span = di.cloneNode(false);
+//
+//                str.push(decodeURIComponent(di.getAttribute('data')));
+//                span.appendChild(me.document.createTextNode(str.join('\n')));
+//                di.parentNode.replaceChild(span, di);
+//            });
+//        }
     });
 
 
     me.addListener("aftergetcontent aftersetcontent aftergetscene", function () {
-        var me = this;
-        var list = getEleByClsName(me.document, 'math-container');
-
-        if (list.length) {
-            utils.each(list, function (pi) {
-                var first = pi.firstChild;
-                while (first && first.nodeType == 1 && !dtd.$empty[first.tagName]) {
-                    if (domUtils.isBookmarkNode(first)) {
-                        first = first.nextSibling;
-                        continue;
-                    }
-                    first = first.firstChild;
-                }
-                if (first.nodeType == 3) {
-                    first.nodeValue = "$$" + decodeURIComponent(pi.getAttribute('data')) + "$$";
-                }
-                me.window.MathJax.Hub.Typeset(pi);
-            });
-        }
+//        var me = this;
+//        var list = getEleByClsName(me.document, 'math-container');
+//
+//        if (list.length) {
+//            utils.each(list, function (pi) {
+//                var first = pi.firstChild;
+//                while (first && first.nodeType == 1 && !dtd.$empty[first.tagName]) {
+//                    if (domUtils.isBookmarkNode(first)) {
+//                        first = first.nextSibling;
+//                        continue;
+//                    }
+//                    first = first.firstChild;
+//                }
+//                if (first.nodeType == 3) {
+//                    first.nodeValue = "$$" + decodeURIComponent(pi.getAttribute('data')) + "$$";
+//                }
+//                debugger;
+//                me.window.MathJax.Hub.Typeset(pi);
+//            });
+//        }
     });
 
 
-    //避免table插件对于代码高亮的影响
-    me.addListener('excludetable excludeNodeinautotype', function (cmd, target) {
-        if (target && domUtils.findParent(target, function (node) {
-            return node.tagName == '' && domUtils.hasClass(node, 'syntaxhighlighter');
-        }, true)) {
-            return true;
-        }
-    });
-
-    me.addListener('getAllHtml', function (type, headHtml) {
-        var coreHtml = '';
-        for (var i = 0, ci, divs = domUtils.getElementsByTagName(me.document, 'table'); ci = divs[i++];) {
-            if (domUtils.hasClass(ci, 'syntaxhighlighter')) {
-                coreHtml = '<script type="text/javascript">window.onload = function(){SyntaxHighlighter.highlight();' +
-                    'setTimeout(function(){ ' +
-                    "   var tables = document.getElementsByTagName('table');" +
-                    "   for(var t= 0,ti;ti=tables[t++];){" +
-                    "       if(/SyntaxHighlighter/i.test(ti.className)){" +
-                    "           var tds = ti.getElementsByTagName('td');" +
-                    "           for(var i=0,li,ri;li=tds[0].childNodes[i];i++){" +
-                    "               ri = tds[1].firstChild.childNodes[i];" +
-                    "               if(ri){" +
-                    "                  ri.style.height = li.style.height = ri.offsetHeight + 'px';" +
-                    "               }" +
-                    "           }" +
-                    "       }" +
-                    "   }" +
-                    '},100)' +
-                    '}</script>'
-                break;
-            }
-        }
-        if (!coreHtml) {
-            var tmpNode;
-            if (tmpNode = me.document.getElementById('syntaxhighlighter_css')) {
-                domUtils.remove(tmpNode)
-            }
-            if (tmpNode = me.document.getElementById('syntaxhighlighter_js')) {
-                domUtils.remove(tmpNode)
-
-            }
-        }
-        coreHtml && headHtml.push(coreHtml)
-    });
+//    //避免table插件对于代码高亮的影响
+//    me.addListener('excludetable excludeNodeinautotype', function (cmd, target) {
+//        if (target && domUtils.findParent(target, function (node) {
+//            return node.tagName == '' && domUtils.hasClass(node, 'syntaxhighlighter');
+//        }, true)) {
+//            return true;
+//        }
+//    });
+//
+//    me.addListener('getAllHtml', function (type, headHtml) {
+//        var coreHtml = '';
+//        for (var i = 0, ci, divs = domUtils.getElementsByTagName(me.document, 'table'); ci = divs[i++];) {
+//            if (domUtils.hasClass(ci, 'syntaxhighlighter')) {
+//                coreHtml = '<script type="text/javascript">window.onload = function(){SyntaxHighlighter.highlight();' +
+//                    'setTimeout(function(){ ' +
+//                    "   var tables = document.getElementsByTagName('table');" +
+//                    "   for(var t= 0,ti;ti=tables[t++];){" +
+//                    "       if(/SyntaxHighlighter/i.test(ti.className)){" +
+//                    "           var tds = ti.getElementsByTagName('td');" +
+//                    "           for(var i=0,li,ri;li=tds[0].childNodes[i];i++){" +
+//                    "               ri = tds[1].firstChild.childNodes[i];" +
+//                    "               if(ri){" +
+//                    "                  ri.style.height = li.style.height = ri.offsetHeight + 'px';" +
+//                    "               }" +
+//                    "           }" +
+//                    "       }" +
+//                    "   }" +
+//                    '},100)' +
+//                    '}</script>'
+//                break;
+//            }
+//        }
+//        if (!coreHtml) {
+//            var tmpNode;
+//            if (tmpNode = me.document.getElementById('syntaxhighlighter_css')) {
+//                domUtils.remove(tmpNode)
+//            }
+//            if (tmpNode = me.document.getElementById('syntaxhighlighter_js')) {
+//                domUtils.remove(tmpNode)
+//
+//            }
+//        }
+//        coreHtml && headHtml.push(coreHtml)
+//    });
 };
