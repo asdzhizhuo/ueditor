@@ -120,10 +120,10 @@ UE.plugins['insertformula'] = function () {
 //    });
 
     me.addListener('getAllHtml', function (type, headHtml) {
-        var coreHtml = '';
-        coreHtml += '<script type="text/javascript">window.onload = function(){MathJax.Hub.Startup.onload();}</script>' +
-            '<script id="MathJax"  type="text/javascript" src="' +
-            (me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js"') + ' ></script>';
+        var coreHtml = '<script id="MathJax"  type="text/javascript" src="' +
+            (me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js?config=default"') + ' >' +
+                'MathJax.Hub.Startup.onload();' +
+            '</script>';
 
         var tmpNode = me.document.getElementById('formula');
         if (tmpNode) {
