@@ -8,9 +8,12 @@
 UE.plugins['insertformula'] = function () {
     var me = this;
     me.commands['insertformula'] = {
-        execCommand:function (cmdName, texStr) {
-            if (texStr.length > 0) {
-                me.execCommand('inserthtml', texStr);
+        execCommand:function (cmdName, html, css) {
+            if (html.length > 0) {
+                me.execCommand('inserthtml', html);
+            }
+            if (css.length > 0) {
+                utils.cssRule('formula', css, me.document);
             }
         },
         queryCommandState:function () {
@@ -22,10 +25,10 @@ UE.plugins['insertformula'] = function () {
             var range = this.selection.getRange(), start, end;
             range.adjustmentBoundary();
             start = domUtils.findParent(range.startContainer, function (node) {
-                return node.nodeType == 1 && node.tagName == 'DIV' && domUtils.hasClass(node, 'MathJax_Display')
+                return node.nodeType == 1 && node.tagName.toLowerCase() == 'span' && domUtils.hasClass(node, 'MathJax')
             }, true);
             end = domUtils.findParent(range.endContainer, function (node) {
-                return node.nodeType == 1 && node.tagName == 'DIV' && domUtils.hasClass(node, 'MathJax_Display')
+                return node.nodeType == 1 && node.tagName.toLowerCase() == 'span' && domUtils.hasClass(node, 'MathJax')
             }, true);
             return start && end && start == end ? 1 : 0;
         }
@@ -57,16 +60,6 @@ UE.plugins['insertformula'] = function () {
         }
         return orgQuery.apply(this, arguments)
     };
-    me.addListener("ready", function () {
-        if (!window.MathJax) {
-            utils.loadFile(me.document, {
-                src:me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + "third-party/MathJax/MathJax.js?config=default",
-                tag:"script",
-                type:"text/javascript",
-                defer:"defer"
-            });
-        }
-    });
 
     me.addListener('beforeselectionchange afterselectionchange', function (type) {
         me.formula = /^b/.test(type) ? me.queryCommandState('insertformula') : 0;
@@ -88,23 +81,23 @@ UE.plugins['insertformula'] = function () {
     }
 
     me.addListener("beforegetcontent beforegetscene", function () {
-//        var list = getEleByClsName(this.document, 'math-container');
-//        if (list.length) {
-//            utils.each(list, function (di) {
-//                var str = [];
-//                var span = di.cloneNode(false);
-//
-//                str.push(decodeURIComponent(di.getAttribute('data')));
-//                span.appendChild(me.document.createTextNode(str.join('\n')));
-//                di.parentNode.replaceChild(span, di);
-//            });
-//        }
+        var list = getEleByClsName(this.document, 'MathJax');
+        if (list.length) {
+            utils.each(list, function (di) {
+                var str = [];
+                var span = di.cloneNode(false);
+
+                str.push(decodeURIComponent(di.getAttribute('data')));
+                span.appendChild(me.document.createTextNode(str.join('\n')));
+                di.parentNode.replaceChild(span, di);
+            });
+        }
     });
 
 
     me.addListener("aftergetcontent aftersetcontent aftergetscene", function () {
 //        var me = this;
-//        var list = getEleByClsName(me.document, 'math-container');
+//        var list = getEleByClsName(me.document, 'MathJax');
 //
 //        if (list.length) {
 //            utils.each(list, function (pi) {
@@ -119,7 +112,6 @@ UE.plugins['insertformula'] = function () {
 //                if (first.nodeType == 3) {
 //                    first.nodeValue = "$$" + decodeURIComponent(pi.getAttribute('data')) + "$$";
 //                }
-//                debugger;
 //                me.window.MathJax.Hub.Typeset(pi);
 //            });
 //        }
