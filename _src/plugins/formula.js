@@ -121,17 +121,14 @@ UE.plugins['insertformula'] = function () {
 
     me.addListener('getAllHtml', function (type, headHtml) {
         var coreHtml = '';
-        var list = getEleByClsName(this.document, 'MathJax');
-        for (var i = 0, ci; ci = list[i++];) {
-            coreHtml = '<script type="text/javascript">window.onload = function(){' +
-                        'MathJax.Hub.Startup.onload();'+
-                '}</script>';
-        }
-        if (!coreHtml) {
-            var tmpNode;
-            if (tmpNode = me.document.getElementById('formula')) {
-                domUtils.remove(tmpNode)
-            }
+        coreHtml += '<script type="text/javascript">window.onload = function(){' +
+                    'MathJax.Hub.Startup.onload();'+
+            '}</script>';
+        coreHtml += '<script id="MathJax"  type="text/javascript" src="' +
+            (me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js"') + ' ></script>';
+
+        if (tmpNode = me.document.getElementById('formula')) {
+            domUtils.remove(tmpNode);
         }
         coreHtml && headHtml.push(coreHtml)
     });
