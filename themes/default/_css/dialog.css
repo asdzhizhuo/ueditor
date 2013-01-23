@@ -166,7 +166,11 @@
     *width: 506px;
     height: 360px;
 }
-
+/*formula-dialog*/
+.edui-default .edui-for-formula .edui-dialog-content {
+    width: 715px;
+    height: 460px;
+}
 /*spechars-dialog*/
 .edui-default .edui-for-spechars .edui-dialog-content {
     width: 620px;
