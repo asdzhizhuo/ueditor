@@ -88,10 +88,10 @@ UE.plugins['insertformula'] = function () {
         });
 
         if (list.length) {
-            var str="";
+            var str = "";
             utils.each(list, function (di) {
                 var span = di.cloneNode(false);
-                str=decodeURIComponent(di.getAttribute('data'));
+                str = decodeURIComponent(di.getAttribute('data'));
                 span.appendChild(me.document.createTextNode(str));
                 di.parentNode.replaceChild(span, di);
             });
@@ -121,13 +121,12 @@ UE.plugins['insertformula'] = function () {
 
     me.addListener('getAllHtml', function (type, headHtml) {
         var coreHtml = '';
-        coreHtml += '<script type="text/javascript">window.onload = function(){' +
-                    'MathJax.Hub.Startup.onload();'+
-            '}</script>';
-        coreHtml += '<script id="MathJax"  type="text/javascript" src="' +
+        coreHtml += '<script type="text/javascript">window.onload = function(){MathJax.Hub.Startup.onload();}</script>' +
+            '<script id="MathJax"  type="text/javascript" src="' +
             (me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js"') + ' ></script>';
 
-        if (tmpNode = me.document.getElementById('formula')) {
+        var tmpNode = me.document.getElementById('formula');
+        if (tmpNode) {
             domUtils.remove(tmpNode);
         }
         coreHtml && headHtml.push(coreHtml)
