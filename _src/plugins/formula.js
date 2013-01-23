@@ -120,7 +120,7 @@ UE.plugins['insertformula'] = function () {
 //    });
 
     me.addListener('getAllHtml', function (type, headHtml) {
-        var coreHtml = '<script id="MathJax"  type="text/javascript" src="' +
+        var coreHtml = '<script  type="text/javascript" src="' +
             (me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js?config=default"') + ' >' +
                 'MathJax.Hub.Startup.onload();' +
             '</script>';
