@@ -81,40 +81,32 @@ UE.plugins['insertformula'] = function () {
     }
 
     me.addListener("beforegetcontent beforegetscene", function () {
-        var list = getEleByClsName(this.document, 'MathJax');
-        if (list.length) {
-            utils.each(list, function (di) {
+        me._MathJaxEleList = getEleByClsName(this.document, 'MathJax');
+        if (me._MathJaxEleList.length) {
+            utils.each(me._MathJaxEleList, function (di) {
                 var str = [];
                 var span = di.cloneNode(false);
-
                 str.push(decodeURIComponent(di.getAttribute('data')));
                 span.appendChild(me.document.createTextNode(str.join('\n')));
-                di.parentNode.replaceChild(span, di);
+
+                di.insertBefore(span);
+                domUtils.remove(di,false);
+                debugger;
+//                di.parentNode.replaceChild(span, di);
             });
         }
     });
 
 
     me.addListener("aftergetcontent aftersetcontent aftergetscene", function () {
-//        var me = this;
-//        var list = getEleByClsName(me.document, 'MathJax');
-//
-//        if (list.length) {
-//            utils.each(list, function (pi) {
-//                var first = pi.firstChild;
-//                while (first && first.nodeType == 1 && !dtd.$empty[first.tagName]) {
-//                    if (domUtils.isBookmarkNode(first)) {
-//                        first = first.nextSibling;
-//                        continue;
-//                    }
-//                    first = first.firstChild;
-//                }
-//                if (first.nodeType == 3) {
-//                    first.nodeValue = "$$" + decodeURIComponent(pi.getAttribute('data')) + "$$";
-//                }
-//                me.window.MathJax.Hub.Typeset(pi);
-//            });
-//        }
+        me._MathJaxTxtList = getEleByClsName(me.document, 'MathJax');
+        if (me._MathJaxTxtList.length) {
+            var i = 0;
+            utils.each(me._MathJaxTxtList, function (di) {
+                di.parentNode.replaceChild(me._MathJaxEleList[i], di);
+                i++;
+            });
+        }
     });
 
 
