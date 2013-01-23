@@ -81,10 +81,10 @@ UE.plugins['insertformula'] = function () {
     }
 
     me.addListener("beforegetcontent beforegetscene", function () {
-        me._MathJaxEleList = [];
+        me._MathJaxList = [];
         var list = getEleByClsName(this.document, 'MathJax');
         utils.each(list, function (di) {
-            me._MathJaxEleList.push(di.cloneNode(true));
+            me._MathJaxList.push(di.cloneNode(true));
         });
 
         if (list.length) {
@@ -105,7 +105,7 @@ UE.plugins['insertformula'] = function () {
         if (list.length) {
             var i = 0;
             utils.each(list, function (di) {
-                di.parentNode.replaceChild(me._MathJaxEleList[i++], di);
+                di.parentNode.replaceChild(me._MathJaxList[i++], di);
             });
         }
     });
@@ -119,40 +119,35 @@ UE.plugins['insertformula'] = function () {
 //            return true;
 //        }
 //    });
-//
-//    me.addListener('getAllHtml', function (type, headHtml) {
-//        var coreHtml = '';
-//        for (var i = 0, ci, divs = domUtils.getElementsByTagName(me.document, 'table'); ci = divs[i++];) {
-//            if (domUtils.hasClass(ci, 'syntaxhighlighter')) {
-//                coreHtml = '<script type="text/javascript">window.onload = function(){SyntaxHighlighter.highlight();' +
-//                    'setTimeout(function(){ ' +
-//                    "   var tables = document.getElementsByTagName('table');" +
-//                    "   for(var t= 0,ti;ti=tables[t++];){" +
-//                    "       if(/SyntaxHighlighter/i.test(ti.className)){" +
-//                    "           var tds = ti.getElementsByTagName('td');" +
-//                    "           for(var i=0,li,ri;li=tds[0].childNodes[i];i++){" +
-//                    "               ri = tds[1].firstChild.childNodes[i];" +
-//                    "               if(ri){" +
-//                    "                  ri.style.height = li.style.height = ri.offsetHeight + 'px';" +
-//                    "               }" +
-//                    "           }" +
-//                    "       }" +
-//                    "   }" +
-//                    '},100)' +
-//                    '}</script>'
-//                break;
-//            }
-//        }
-//        if (!coreHtml) {
-//            var tmpNode;
-//            if (tmpNode = me.document.getElementById('syntaxhighlighter_css')) {
-//                domUtils.remove(tmpNode)
-//            }
-//            if (tmpNode = me.document.getElementById('syntaxhighlighter_js')) {
-//                domUtils.remove(tmpNode)
-//
-//            }
-//        }
-//        coreHtml && headHtml.push(coreHtml)
-//    });
+
+    me.addListener('getAllHtml', function (type, headHtml) {
+        var coreHtml = '';
+        var list = getEleByClsName(this.document, 'MathJax');
+        for (var i = 0, ci; ci = list[i++];) {
+            coreHtml = '<script type="text/javascript">window.onload = function(){SyntaxHighlighter.highlight();' +
+                'setTimeout(function(){ ' +
+                "   var tables = document.getElementsByTagName('table');" +
+                "   for(var t= 0,ti;ti=tables[t++];){" +
+                "       if(/SyntaxHighlighter/i.test(ti.className)){" +
+                "           var tds = ti.getElementsByTagName('td');" +
+                "           for(var i=0,li,ri;li=tds[0].childNodes[i];i++){" +
+                "               ri = tds[1].firstChild.childNodes[i];" +
+                "               if(ri){" +
+                "                  ri.style.height = li.style.height = ri.offsetHeight + 'px';" +
+                "               }" +
+                "           }" +
+                "       }" +
+                "   }" +
+                '},100)' +
+                '}</script>'
+            break;
+        }
+        if (!coreHtml) {
+            var tmpNode;
+            if (tmpNode = me.document.getElementById('formula')) {
+                domUtils.remove(tmpNode)
+            }
+        }
+        coreHtml && headHtml.push(coreHtml)
+    });
 };
