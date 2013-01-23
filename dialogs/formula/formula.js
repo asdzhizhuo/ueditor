@@ -95,7 +95,7 @@ dialog.onok = function () {
             mathjaxDom = mathjaxDom.previousSibling;
         }
         while (mathjaxDom && mathjaxDom.className != 'MathJax_Display');
-        mathjaxDom.firstChild.setAttribute("data", encodeURIComponent(textValue));
+        mathjaxDom.firstChild.setAttribute("data", encodeURIComponent("$$"+textValue+"$$"));
         editor.execCommand('insertformula', mathjaxDom.innerHTML, getStyle());
     }
 };

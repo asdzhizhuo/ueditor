@@ -88,12 +88,11 @@ UE.plugins['insertformula'] = function () {
         });
 
         if (list.length) {
+            var str="";
             utils.each(list, function (di) {
-                var str = [];
                 var span = di.cloneNode(false);
-                str.push(decodeURIComponent(di.getAttribute('data')));
-                span.appendChild(me.document.createTextNode(str.join('\n')));
-
+                str=decodeURIComponent(di.getAttribute('data'));
+                span.appendChild(me.document.createTextNode(str));
                 di.parentNode.replaceChild(span, di);
             });
         }
@@ -124,23 +123,9 @@ UE.plugins['insertformula'] = function () {
         var coreHtml = '';
         var list = getEleByClsName(this.document, 'MathJax');
         for (var i = 0, ci; ci = list[i++];) {
-            coreHtml = '<script type="text/javascript">window.onload = function(){SyntaxHighlighter.highlight();' +
-                'setTimeout(function(){ ' +
-                "   var tables = document.getElementsByTagName('table');" +
-                "   for(var t= 0,ti;ti=tables[t++];){" +
-                "       if(/SyntaxHighlighter/i.test(ti.className)){" +
-                "           var tds = ti.getElementsByTagName('td');" +
-                "           for(var i=0,li,ri;li=tds[0].childNodes[i];i++){" +
-                "               ri = tds[1].firstChild.childNodes[i];" +
-                "               if(ri){" +
-                "                  ri.style.height = li.style.height = ri.offsetHeight + 'px';" +
-                "               }" +
-                "           }" +
-                "       }" +
-                "   }" +
-                '},100)' +
-                '}</script>'
-            break;
+            coreHtml = '<script type="text/javascript">window.onload = function(){' +
+                        'MathJax.Hub.Startup.onload();'+
+                '}</script>';
         }
         if (!coreHtml) {
             var tmpNode;
