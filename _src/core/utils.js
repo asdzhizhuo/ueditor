@@ -26,16 +26,16 @@ var utils = UE.utils = {
      */
     each : function(obj, iterator, context) {
         if (obj == null) return;
-        if (Array.prototype.forEach && obj.forEach === Array.prototype.forEach) {
-            obj.forEach(iterator, context);
-        } else if (obj.length === +obj.length) {
+        if (obj.length === +obj.length) {
             for (var i = 0, l = obj.length; i < l; i++) {
-                if(iterator.call(context, obj[i], i, obj) === false)return;
+                if(iterator.call(context, obj[i], i, obj) === false)
+                    return false;
             }
         } else {
             for (var key in obj) {
                 if (obj.hasOwnProperty(key)) {
-                    if(iterator.call(context, obj[key], key, obj) === false)return
+                    if(iterator.call(context, obj[key], key, obj) === false)
+                        return false;
                 }
             }
         }
@@ -258,14 +258,18 @@ var utils = UE.utils = {
     loadFile:function () {
         var tmpList = [];
         function getItem(doc,obj){
-            for(var i= 0,ci;ci=tmpList[i++];){
-                if(ci.doc === doc && ci.url == (obj.src || obj.href)){
-                    return ci;
+            try{
+                for(var i= 0,ci;ci=tmpList[i++];){
+                    if(ci.doc === doc && ci.url == (obj.src || obj.href)){
+                        return ci;
+                    }
                 }
+            }catch(e){
+                return null;
             }
+
         }
         return function (doc, obj, fn) {
-
             var item = getItem(doc,obj);
             if (item) {
                 if(item.ready){
@@ -299,7 +303,7 @@ var utils = UE.utils = {
             }
             element.onload = element.onreadystatechange = function () {
                 if (!this.readyState || /loaded|complete/.test(this.readyState)) {
-                    item = getItem(doc,obj)
+                    item = getItem(doc,obj);
                     if (item.funs.length > 0) {
                         item.ready = 1;
                         for (var fi; fi = item.funs.pop();) {
@@ -308,6 +312,9 @@ var utils = UE.utils = {
                     }
                     element.onload = element.onreadystatechange = null;
                 }
+            };
+            element.onerror = function(){
+                throw Error('The load '+(obj.href||obj.src)+' fails,check the url settings of file editor_config.js ')
             };
             doc.getElementsByTagName("head")[0].appendChild(element);
         }
@@ -565,8 +572,7 @@ var utils = UE.utils = {
  * @name isNumber
  * @grammar UE.utils.isNumber(obj)  => true|false
  */
-
-utils.each(['String','Function','Array','Number'],function(v){
+utils.each(['String','Function','Array','Number','RegExp'],function(v){
     UE.utils['is' + v] = function(obj){
         return Object.prototype.toString.apply(obj) == '[object ' + v + ']';
     }

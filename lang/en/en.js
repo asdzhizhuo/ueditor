@@ -16,7 +16,7 @@ UE.I18N['en'] = {
         'deleterow':'DeleteRow', 'deletecol':'DeleteCol', 'splittorows':'SplitToRows',
         'splittocols':'SplitToCols', 'splittocells':'SplitToCells','deletecaption':'DeleteCaption','inserttitle':'InsertTitle',
         'mergecells':'MergeCells', 'deletetable':'DeleteTable', 'cleardoc':'Clear', 'insertparagraphbeforetable':"InsertParagraphBeforeTable",
-        'fontfamily':'FontFamily', 'fontsize':'FontSize', 'paragraph':'Paragraph', 'insertimage':'Image', 'edittable':'Edit Table', 'link':'Link',
+        'fontfamily':'FontFamily', 'fontsize':'FontSize', 'paragraph':'Paragraph', 'insertimage':'Image','edittable':'Edit Table', edittd:'Edit Td','link':'Link',
         'emotion':'Emotion', 'spechars':'Spechars', 'searchreplace':'SearchReplace', 'map':'BaiduMap', 'gmap':'GoogleMap',
         'insertvideo':'Video', 'help':'Help', 'justifyleft':'JustifyLeft', 'justifyright':'JustifyRight', 'justifycenter':'JustifyCenter',
         'justifyjustify':'Justify', 'forecolor':'FontColor', 'backcolor':'BackColor', 'insertorderedlist':'OL',
@@ -24,10 +24,16 @@ UE.I18N['en'] = {
         'rowspacingtop':'RowSpacingTop', 'rowspacingbottom':'RowSpacingBottom', 'highlightcode':'Code', 'pagebreak':'PageBreak', 'insertframe':'Iframe', 'imagenone':'Default',
         'imageleft':'ImageLeft', 'imageright':'ImageRight', 'attachment':'Attachment', 'imagecenter':'ImageCenter', 'wordimage':'WordImage',
         'lineheight':'LineHeight','edittip':'EditTip','customstyle':'CustomStyle', 'scrawl':'Scrawl', 'autotypeset':'AutoTypeset',
-        'webapp':'WebAPP', 'touppercase':'UpperCase', 'tolowercase':'LowerCase','template':'Template','background':'Background',
+        'webapp':'WebAPP', 'touppercase':'UpperCase', 'tolowercase':'LowerCase','template':'Template','background':'Background',inserttable:'InsertTable',
         'music':'Music'
     },
     'insertorderedlist':{
+        'num':'1,2,3...',
+        'num1':'1),2),3)...',
+        'num2':'(1),(2),(3)...',
+        'cn':'一,二,三....',
+        'cn1':'一),二),三)....',
+        'cn2':'(一),(二),(三)....',
         'decimal':'1,2,3...',
         'lower-alpha':'a,b,c...',
         'lower-roman':'i,ii,iii...',
@@ -37,7 +43,9 @@ UE.I18N['en'] = {
     'insertunorderedlist':{
         'circle':'○ Circle',
         'disc':'● Circle dot',
-        'square':'■ Rectangle '
+        'square':'■ Rectangle ',
+        'dash' :'－ Dash',
+        'dot' : '。dot'
     },
     'paragraph':{'p':'Paragraph', 'h1':'Title 1', 'h2':'Title 2', 'h3':'Title 3', 'h4':'Title 4', 'h5':'Title 5', 'h6':'Title 6'},
     'fontfamily':{
@@ -84,6 +92,10 @@ UE.I18N['en'] = {
         'paragraph':"Paragraph",
         'edittable':"Table property",
         'aligncell':'Align cell',
+        'aligntable':'Table alignment',
+        'tableleft':'Left float',
+        'tablecenter':'Center',
+        'tableright':'Right float',
         'aligntd':'Cell alignment',
         'edittd':"Cell property",
         'table':"Table",
@@ -141,6 +153,7 @@ UE.I18N['en'] = {
     't_col':'col',
     'pasteOpt':'Paste Option',
     'pasteSourceFormat':"Keep Source Formatting",
+    'tagFormat':'Keep tag',
     'pasteTextFormat':'Keep Text only',
     'more':'More',
     'autoTypeSet':{
@@ -341,7 +354,7 @@ UE.I18N['en'] = {
         'static':{
             'lang_input_about':'About',
             'lang_input_shortcuts':'Shortcuts',
-            'lang_input_version':'Version:1.2.4',
+            'lang_input_version':'Version:1.2.5',
             'lang_input_introduction':"UEditor is developed by Baidu Co.ltd.  It is lightweight, customizable , focusing on user experience and etc. , UEditor is based on open source BSD license , allowing free use and redistribution.",
             'lang_Txt_shortcuts':'Shortcuts',
             'lang_Txt_func':'Function',
@@ -354,10 +367,8 @@ UE.I18N['en'] = {
             'lang_Txt_italic':'Italic',
             'lang_Txt_underline':'Underline',
             'lang_Txt_selectAll':'Select All',
-            'lang_Txt_removeFormat':'Remove Format',
-            'lang_Txt_leftJustification':'Justify Left',
-            'lang_Txt_rightJustification':'Justify Right',
-            'lang_Txt_visualEnter':'Submit'
+            'lang_Txt_visualEnter':'Submit',
+            'lang_Txt_fullscreen':'Fullscreen'
         }
     },
     insertframe:{
@@ -464,16 +475,23 @@ UE.I18N['en'] = {
             'lang_tableSize':'Automatically adjust table size',
                 'lang_autoSizeContent':'Adaptive by form text',
             'lang_autoSizePage':'Page width adaptive',
-            'lang_example':'Example'
+            'lang_example':'Example',
+            'lang_borderStyle':'Table Border',
+            'lang_color':'Color:'
         },
         captionName:'Caption',
         titleName:'Title',
-        cellsName:'content'
+        cellsName:'text'
     },
     'edittip':{
         'static':{
             lang_delRow:'Delete entire row',
             lang_delCol:'Delete entire col'
+        }
+    },
+    'edittd':{
+        'static':{
+            lang_tdBkColor:'Background Color:'
         }
     },
     wordimage:{
@@ -506,8 +524,5 @@ UE.I18N['en'] = {
             listBackgroundURL:'',
             buttonURL:'button.png'
         }
-    },
-    'formula':{
-
     }
 };

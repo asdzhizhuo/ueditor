@@ -376,7 +376,7 @@ var imageUploader = {},
         img.onload = function () {
             flagImg = this;
             showImageInfo(this);
-            showPreviewImage(this);
+            showPreviewImage(this,true);
             this.onload = null;
         };
         img.onerror = function () {
@@ -415,24 +415,19 @@ var imageUploader = {},
      */
     function showPreviewImage(img, needClone) {
         var tmpWidth = img.width, tmpHeight = img.height;
-        // byxuheng ie9下img.width=tmpWidth这样赋值不上
-        if (!(browser.ie && browser.version == 9) && needClone) {
-            //针对编辑图片时
-            img = img.cloneNode(true);
-            img.width = tmpWidth;
-            img.height = tmpHeight;
-            flagImg = img;
+        var maxWidth = 262,maxHeight = 262,
+            target = scaling(tmpWidth,tmpHeight,maxWidth,maxHeight);
+        target.border = img.border||0;
+        target.src = img.src;
+        flagImg = true;
+        if ((target.width + 2 * target.border) > maxWidth) {
+            target.width = maxWidth - 2 * target.border;
         }
-        var maxWidth = 262;
-        scale(img, maxWidth, maxWidth, maxWidth);
-        if ((img.width + 2 * img.border) > maxWidth) {
-            img.width = maxWidth - 2 * img.border;
-        }
-        if ((img.height + 2 * img.border) > maxWidth) {
-            img.height = maxWidth - 2 * img.border;
+        if ((target.height + 2 * target.border) > maxWidth) {
+            target.height = maxWidth - 2 * target.border;
         }
         var preview = g("preview");
-        preview.innerHTML = '<img src="' + img.src + '" width="' + img.width + '" height="' + img.height + '" border="' + img.border + 'px solid #000" />';
+        preview.innerHTML = '<img src="' + target.src + '" width="' + target.width + '" height="' + target.height + '" border="' + target.border + 'px solid #000" />';
     }
 
     /**
@@ -459,6 +454,20 @@ var imageUploader = {},
         }
     }
 
+    function scaling(width,height,maxWidth,maxHeight){
+        if(width<maxWidth && height<maxHeight) return {width:width,height:height};
+        var srcRatio = (width/height).toFixed(2),
+            tarRatio = (maxWidth/maxHeight).toFixed(2),
+            w,h;
+        if(srcRatio<tarRatio){
+            h = maxHeight;
+            w = h*srcRatio;
+        }else{
+            w = maxWidth;
+            h = w/srcRatio;
+        }
+        return {width:w.toFixed(0),height:h.toFixed(0)}
+    }
     /**
      * 创建flash实例
      * @param opt
@@ -605,6 +614,7 @@ var imageUploader = {},
                                         var w = this.width, h = this.height;
                                         scale(this, 100, 120, 80);
                                         this.title = lang.toggleSelect + w + "X" + h;
+                                        this.onload = null;
                                     };
                                     img.setAttribute(k < 35 ? "src" : "lazy_src", editor.options.imageManagerPath + ci.replace(/\s+|\s+/ig, ""));
                                     img.setAttribute("data_ue_src", editor.options.imageManagerPath + ci.replace(/\s+|\s+/ig, ""));

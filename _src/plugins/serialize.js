@@ -614,9 +614,6 @@ UE.plugins['serialize'] = function () {
 
                     optStyle( node );
                 }
-                if(node.attributes['class'] == 'noBorderTable'){
-                    delete node.attributes['class'];
-                }
                 break;
             case 'td':
             case 'th':
@@ -636,10 +633,6 @@ UE.plugins['serialize'] = function () {
                 }
                 if ( ie && node.attributes.style ) {
                     optStyle( node );
-
-                }
-                if(node.attributes['class'] == 'selectTdClass'){
-                    delete node.attributes['class']
                 }
                 break;
             case 'img'://锚点，img==>a

@@ -82,6 +82,7 @@
         EventBase.call( me );
         me.commands = {};
         me.options = utils.extend( utils.clone(options || {}),UEDITOR_CONFIG, true );
+        me.shortcutkeys = {};
         //设置默认的常用属性
         me.setOpt( {
             isShow:true,
@@ -90,7 +91,7 @@
             iframeCssUrl:me.options.UEDITOR_HOME_URL + 'themes/iframe.css',
             textarea:'editorValue',
             focus:false,
-            initialFrameWidth:'100%',
+            initialFrameWidth:1000,
             initialFrameHeight:me.options.minFrameHeight||320,//兼容老版本配置项
             minFrameWidth:800,
             minFrameHeight:220,
@@ -280,7 +281,7 @@
                     };
                     this._setDefaultContent( options.initialContent );
                 } else
-                    this.setContent( options.initialContent, true );
+                    this.setContent( options.initialContent, false,true );
             }
             //为form提交提供一个隐藏的textarea
             for ( var form = this.iframe.parentNode; !domUtils.isBody( form ); form = form.parentNode ) {
@@ -309,27 +310,21 @@
             if ( options.fullscreen && me.ui ) {
                 me.ui.setFullScreen( true );
             }
-            //解决ff下点击图片会复制问题
-            //ff下的table不能编辑
-//            if(browser.gecko){
-//                me.document.execCommand( 'enableObjectResizing', false, false );
-//                me.document.execCommand( 'enableInlineTableEditing', false,options.tableNativeEditInFF );
-//            }
+
             try {
                 me.document.execCommand( '2D-position', false, false );
             } catch ( e ) {}
             try {
-                me.document.execCommand( 'enableInlineTableEditing', false, options.tableNativeEditInFF );
+                me.document.execCommand( 'enableInlineTableEditing', false, false );
             } catch ( e ) {}
             try {
                 me.document.execCommand( 'enableObjectResizing', false, false );
             } catch ( e ) {
-                domUtils.on(me.body,browser.ie ? 'resizestart' : 'resize', function( evt ) {
-                    domUtils.preventDefault(evt)
-                });
-
+//                domUtils.on(me.body,browser.ie ? 'resizestart' : 'resize', function( evt ) {
+//                    domUtils.preventDefault(evt)
+//                });
             }
-
+            me._bindshortcutKeys();
             me.isReady = 1;
             me.fireEvent( 'ready' );
             options.onready && options.onready.call(me);
@@ -396,6 +391,40 @@
             this.document.body.style.height = height - 20 + 'px';
         },
 
+        addshortcutkey : function(cmd,keys){
+            var obj = {};
+            if(keys){
+                obj[cmd] = keys
+            }else{
+                obj = cmd;
+            }
+            utils.extend(this.shortcutkeys,obj)
+        },
+        _bindshortcutKeys : function(){
+            var me = this,shortcutkeys = this.shortcutkeys;
+            me.addListener('keydown',function(type,e){
+                var keyCode = e.keyCode || e.which;
+                for ( var i in shortcutkeys ) {
+                    var tmp = shortcutkeys[i].split(',');
+                    for(var t= 0,ti;ti=tmp[t++];){
+                        ti = ti.split(':');
+                        var key = ti[0],param = ti[1];
+                        if ( /^(ctrl)(\+shift)?\+(\d+)$/.test( key.toLowerCase() ) || /^(\d+)$/.test( key ) ) {
+                            if ( ( (RegExp.$1 == 'ctrl' ? (e.ctrlKey||e.metaKey) : 0)
+                                && (RegExp.$2 != "" ? e[RegExp.$2.slice(1) + "Key"] : 1)
+                                && keyCode == RegExp.$3
+                                ) ||
+                                keyCode == RegExp.$1
+                                ){
+                                me.execCommand(i,param);
+                                domUtils.preventDefault(e);
+                            }
+                        }
+                    }
+
+                }
+            });
+        },
         /**
          * 获取编辑器内容
          * @name getContent
@@ -417,11 +446,16 @@
             if ( fn ? !fn() : !this.hasContents() ) {
                 return '';
             }
+            var range = me.selection.getRange(),
+                address = range.createAddress();
             me.fireEvent( 'beforegetcontent', cmd );
             var reg = new RegExp( domUtils.fillChar, 'g' ),
             //ie下取得的html可能会有\n存在，要去掉，在处理replace(/[\t\r\n]*/g,'');代码高量的\n不能去除
                     html = me.body.innerHTML.replace( reg, '' ).replace( />[\t\r\n]*?</g, '><' );
             me.fireEvent( 'aftergetcontent', cmd );
+            try{
+                range.moveToAddress(address).select(true);
+            }catch(e){}
             if ( me.serialize ) {
                 var node = me.serialize.parseHTML( html );
                 node = me.serialize.transformOutput( node );
@@ -453,10 +487,21 @@
          */
         getAllHtml:function () {
             var me = this,
-                    headHtml = {html:''},
+                    headHtml = [],
                     html = '';
             me.fireEvent( 'getAllHtml', headHtml );
-            return '<html><head>' + (me.options.charset ? '<meta http-equiv="Content-Type" content="text/html; charset=' + me.options.charset + '"/>' : '') + me.document.getElementsByTagName( 'head' )[0].innerHTML + headHtml.html + '</head>'
+            if(browser.ie && browser.version > 8){
+                var headHtmlForIE9= '';
+                utils.each(me.document.styleSheets,function(si){
+                    headHtmlForIE9 += ( si.href ? '<link rel="stylesheet" type="text/css" href="'+si.href+'" />': '<style>'+si.cssText+'</style>');
+                });
+                utils.each(me.document.getElementsByTagName('script'),function(si){
+                    headHtmlForIE9 += si.outerHTML;
+                });
+
+            }
+            return '<html><head>' + (me.options.charset ? '<meta http-equiv="Content-Type" content="text/html; charset=' + me.options.charset + '"/>' : '')
+                + (headHtmlForIE9 || me.document.getElementsByTagName( 'head' )[0].innerHTML) + headHtml.join('\n') + '</head>'
                     + '<body ' + (ie && browser.version < 9 ? 'class="view"' : '') + '>' + me.getContent( null, null, true ) + '</body></html>';
         },
         /**
@@ -499,7 +544,7 @@
          *     editor.setContent("欢迎使用UEditor！");
          * })
          */
-        setContent:function ( html, notFireSelectionchange ) {
+        setContent:function ( html, isAppendTo,notFireSelectionchange ) {
             var me = this,
                     inline = utils.extend( {a:1, A:1}, dtd.$inline, true ),
                     lastTagName;
@@ -530,7 +575,7 @@
             //去掉了\t\n\r 如果有插入的代码，在源码切换所见即所得模式时，换行都丢掉了
             //\r在ie下的不可见字符，在源码切换时会变成多个&nbsp;
             //trace:1559
-            this.body.innerHTML = html.replace( new RegExp( '[\r' + domUtils.fillChar + ']*', 'g' ), '' );
+            this.body.innerHTML = (isAppendTo ? this.getContent() : '') + html.replace( new RegExp( '[\r' + domUtils.fillChar + ']*', 'g' ), '' );
             //处理ie6下innerHTML自动将相对路径转化成绝对路径的问题
             if ( browser.ie && browser.version < 7 ) {
                 replaceSrc( this.document.body );
@@ -755,15 +800,15 @@
                 if ( me.queryCommandState( cmdName ) != -1 ) {
                     me.fireEvent( 'beforeexeccommand', cmdName );
                     result = this._callCmdFn( 'execCommand', arguments );
-                    me.fireEvent('contentchange');
+                    !me._ignoreContentChange && me.fireEvent('contentchange');
                     me.fireEvent( 'afterexeccommand', cmdName );
                 }
                 me.__hasEnterExecCommand = false;
             } else {
                 result = this._callCmdFn( 'execCommand', arguments );
-                me.fireEvent('contentchange')
+                !me._ignoreContentChange && me.fireEvent('contentchange')
             }
-            !me.__hasEnterExecCommand && me._selectionChange();
+            !me._ignoreContentChange && me._selectionChange();
             return result;
         },
         /**
@@ -976,12 +1021,33 @@
          */
         getLang:function ( path ) {
             var lang = UE.I18N[this.options.lang];
+            if(!lang){
+                throw Error("not import language file");
+            }
             path = (path || "").split( "." );
             for ( var i = 0, ci; ci = path[i++]; ) {
                 lang = lang[ci];
                 if ( !lang )break;
             }
             return lang;
+        },
+        /**
+         * 计算编辑器当前内容的长度
+         * @name  getContentLength
+         * @grammar editor.getContentLength(ingoneHtml,tagNames)  =>
+         * @example
+         * editor.getLang(true)
+         */
+        getContentLength : function(ingoneHtml,tagNames){
+            var count = this.getContent().length;
+            if(ingoneHtml){
+                tagNames = (tagNames||[]).concat([ 'hr','img','iframe']);
+                count = this.getContentTxt().replace(/[\t\r\n]+/g,'').length;
+                for(var i= 0,ci;ci=tagNames[i++];){
+                    count += this.document.getElementsByTagName(ci).length;
+                }
+            }
+            return count;
         }
         /**
          * 得到dialog实例对象

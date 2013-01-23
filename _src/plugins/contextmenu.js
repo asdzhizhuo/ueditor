@@ -14,7 +14,6 @@ UE.plugins['contextmenu'] = function () {
             lang = me.getLang( "contextMenu" ),
             menu,
             items = me.options.contextMenu || [
-                {label:lang['delete'], cmdName:'delete'},
                 {label:lang['selectall'], cmdName:'selectall'},
                 {
                     label:lang.deletecode,
@@ -154,6 +153,16 @@ UE.plugins['contextmenu'] = function () {
                         },
                         '-',
                         {
+                            label:lang.edittd,
+                            cmdName:'edittd',
+                            exec:function () {
+                                if ( UE.ui['edittd'] ) {
+                                    new UE.ui['edittd']( this );
+                                }
+                                this.getDialog('edittd').open();
+                            }
+                        },
+                        {
                             label:lang.edittable,
                             cmdName:'edittable',
                             exec:function () {
@@ -171,39 +180,60 @@ UE.plugins['contextmenu'] = function () {
                     subMenu:[
                         {
                             cmdName:'cellalignment',
-                            value:{align:'left',valign:'top'}
+                            value:{align:'left',vAlign:'top'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'center',valign:'top'}
+                            value:{align:'center',vAlign:'top'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'right',valign:'top'}
+                            value:{align:'right',vAlign:'top'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'left',valign:'middle'}
+                            value:{align:'left',vAlign:'middle'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'center',valign:'middle'}
+                            value:{align:'center',vAlign:'middle'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'right',valign:'middle'}
+                            value:{align:'right',vAlign:'middle'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'left',valign:'bottom'}
+                            value:{align:'left',vAlign:'bottom'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'center',valign:'bottom'}
+                            value:{align:'center',vAlign:'bottom'}
                         },
                         {
                             cmdName:'cellalignment',
-                            value:{align:'right',valign:'bottom'}
+                            value:{align:'right',vAlign:'bottom'}
+                        }
+                    ]
+                },
+                {
+                    group:lang.aligntable,
+                    icon:'aligntable',
+                    subMenu:[
+                        {
+                            cmdName:'tablealignment',
+                            label:lang.tableleft,
+                            value:['float','left']
+                        },
+                        {
+                            cmdName:'tablealignment',
+                            label:lang.tablecenter,
+                            value:['margin','0 auto']
+                        },
+                        {
+                            cmdName:'tablealignment',
+                            label:lang.tableright,
+                            value:['float','right']
                         }
                     ]
                 },
@@ -270,13 +300,15 @@ UE.plugins['contextmenu'] = function () {
                             if ( subItem == '-' ) {
                                 if ( (last = subMenu[subMenu.length - 1 ] ) && last !== '-' ) {
                                     subMenu.push( '-' );
+                                }else{
+                                    subMenu.splice(subMenu.length-1);
                                 }
                             } else {
                                 if ( (me.commands[subItem.cmdName] || UE.commands[subItem.cmdName] || subItem.query) &&
                                         (subItem.query ? subItem.query() : me.queryCommandState( subItem.cmdName )) > -1 ) {
                                     subMenu.push( {
                                         'label':subItem.label || me.getLang( "contextMenu." + subItem.cmdName + (subItem.value || '') )||"",
-                                        'className':'edui-for-' + subItem.cmdName + (subItem.value || ''),
+                                        'className':'edui-for-' +subItem.cmdName,
                                         onclick:subItem.exec ? function () {
                                                 subItem.exec.call( me );
                                         } : function () {
@@ -289,12 +321,17 @@ UE.plugins['contextmenu'] = function () {
                     }
                     if ( subMenu.length ) {
                         function getLabel(){
-                            if(item.icon=="table")
-                                return me.getLang( "contextMenu.table" );
-                            else if(item.icon=="justifyjustify")
-                                return me.getLang( "contextMenu.paragraph" );
-                            else if(item.icon=="aligntd"){
-                                return me.getLang("contextMenu.aligntd");
+                            switch (item.icon){
+                                case "table":
+                                    return me.getLang( "contextMenu.table" );
+                                case "justifyjustify":
+                                    return me.getLang( "contextMenu.paragraph" );
+                                case "aligntd":
+                                    return me.getLang("contextMenu.aligntd");
+                                case "aligntable":
+                                    return me.getLang("contextMenu.aligntable");
+                                default :
+                                    return '';
                             }
                         }
                         contextItems.push( {

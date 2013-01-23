@@ -80,7 +80,8 @@
             },
             notNeedUndo : 1
         };
-        var txtContent,bkRange,htmlContent;
+        var txtContent,htmlContent,address,onlyHtml;
+
         function filter(div){
 
             var html;
@@ -163,10 +164,12 @@
                 if(f){
                     //如果过滤出现问题，捕获它，直接插入内容，避免出现错误导致粘贴整个失败
                     try{
+                        onlyHtml = html = UE.filterWord(html);
+
                         var node =  f.transformInput(
                             f.parseHTML(
                                 //todo: 暂时不走dtd的过滤
-                                f.word(html)//, true
+                                html//, true
                             ),word_img_flag
                         );
                         //trace:924
@@ -198,6 +201,7 @@
                         }
 
                         html = f.toHTML(node,pasteplain);
+
                         txtContent = f.filter(node,{
                             whiteList: {
                                 'p': {'br':1,'BR':1,$:{}},
@@ -226,16 +230,13 @@
                 }
 
                 //自定义的处理
-                html = {'html':html};
+                html = {'html':html,'txtContent':txtContent};
 
                 me.fireEvent('beforepaste',html);
                 //不用在走过滤了
                 if(html.html){
-                    me.fireEvent('clearPasteBookmark');
-                    txtContent = '<span style="display:none;line-height:0px;" id="_ue_paste_id_start">\ufeff</span>'
-                        + txtContent + '<span style="display:none;line-height:0px;" id="_ue_paste_id_end">\ufeff</span>';
-                    htmlContent =  '<span style="display:none;line-height:0px;" id="_ue_paste_id_start">\ufeff</span>'
-                        + html.html + '<span style="display:none;line-height:0px;" id="_ue_paste_id_end">\ufeff</span>';
+                    htmlContent = html.html;
+                    address = me.selection.getRange().createAddress(true);
                     me.execCommand( 'insertHtml',htmlContent,true);
                     me.fireEvent("afterpaste");
                 }
@@ -243,83 +244,47 @@
             }
         }
 
-        me.addListener('clearPasteBookmark',function(){
-            function removeNode(id){
-                var node;
-                while(node = me.document.getElementById(id)){
-                    var parentNode = node.parentNode;
-                    domUtils.remove(node);
-                    while(parentNode && !domUtils.isBody(parentNode)){
-                        var currentNode = parentNode;
-                        parentNode = currentNode.parentNode;
-                        if(domUtils.isEmptyNode(currentNode)){
-                            domUtils.remove(currentNode)
-                        }
-                    }
-                }
-            }
-            removeNode('_ue_paste_id_start');
-            removeNode('_ue_paste_id_end')
-        });
-
-        me.addListener('mousedown keydown',function(cmd,e){
-            if(cmd == 'mousedown' || !e.ctrlKey && !e.metaKey){
-                me.fireEvent('clearPasteBookmark')
-            }
-        });
-        var startAddr,endAddr;
-        me.addListener('beforegetscene',function(){
-
-            var start = me.document.getElementById('_ue_paste_id_start');
-            if(start){
-                startAddr = domUtils.getAddr(start);
-            }
-            var end = me.document.getElementById('_ue_paste_id_end');
-            if(end){
-                endAddr = domUtils.getAddr(end);
-            }
-            if(start && end){
-                domUtils.remove(start);
-                domUtils.remove(end)
-            }
-        });
-        me.addListener('aftergetscene',function(){
-            var span = domUtils.createElement(me.document,'span',{
-                'style' : "display:none;line-height:0px;",
-                'id'  : "_ue_paste_id_start",
-                'innerHTML' : domUtils.fillChar
-            });
-            if(startAddr){
-                domUtils.setAddr(span,startAddr);
-                startAddr = null;
-            }
-            if(endAddr){
-                span = span.cloneNode(true);
-                span.id = '_ue_paste_id_end';
-                domUtils.setAddr(span,endAddr);
-                endAddr = null;
-            }
-        });
         me.addListener('pasteTransfer',function(cmd,plainType){
-
-            var range = me.selection.getRange();
-            var start = me.document.getElementById('_ue_paste_id_start');
-            var end = me.document.getElementById('_ue_paste_id_end');
-            if(start && end && txtContent && htmlContent && txtContent != htmlContent){
-
-                range.setStartAfter(start).setEndAfter(end).deleteContents();
-                range.setStartBefore(start).collapse(true);
-                domUtils.remove(start);
-                range.select(true);
-
+            if(address && txtContent && htmlContent && txtContent != htmlContent){
+                var range = me.selection.getRange();
+                range.moveToAddress(address,true).deleteContents();
+                range.select();
                 me.__hasEnterExecCommand = true;
-                me.execCommand('inserthtml',plainType ? txtContent : htmlContent,true);
+                var html = htmlContent;
+                if(plainType === 2){
+                    html = onlyHtml.replace(/<(\/?)([\w\-]+)([^>]*)>/gi,function(a,b,c,d){
+                        d = d.replace(/([\w\-]*?)\s*=\s*(("([^"]*)")|('([^']*)')|([^\s>]+))/gi,function(str,atr,val){
+                            if({
+                                'src':1,
+                                'href':1,
+                                'name':1
+                            }[atr.toLowerCase()]){
+                                return atr + '=' + val + ' '
+                            }
+                            return ''
+                        });
+                        if({
+                            'span':1,
+                            'script':1,
+                            'style':1
+                        }[c.toLowerCase()]){
+                            return ''
+                        }else{
+                            return '<' + b + c + ' ' + utils.trim(d) + '>'
+                        }
+
+                    });
+                }else if(plainType){
+                    html = txtContent;
+                }
+                me.execCommand('inserthtml',html,true);
                 me.__hasEnterExecCommand = false;
+                var tmpAddress = me.selection.getRange().createAddress(true);
+                address.endAddress = tmpAddress.startAddress;
             }
         });
         me.addListener('ready',function(){
             domUtils.on(me.body,'cut',function(){
-
                 var range = me.selection.getRange();
                 if(!range.collapsed && me.undoManger){
                     me.undoManger.save();
@@ -328,17 +293,12 @@
             });
             //ie下beforepaste在点击右键时也会触发，所以用监控键盘才处理
             domUtils.on(me.body, browser.ie || browser.opera ? 'keydown' : 'paste',function(e){
-
                 if((browser.ie || browser.opera) && ((!e.ctrlKey && !e.metaKey) || e.keyCode != '86')){
                     return;
                 }
-
                 getClipboardData.call( me, function( div ) {
-
                     filter(div);
                 } );
-
-
             });
 
         });

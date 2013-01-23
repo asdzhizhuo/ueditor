@@ -24,7 +24,7 @@ UE.plugins['enterkey'] = function() {
 
                 if (/h\d/i.test(hTag)) {
                     if (browser.gecko) {
-                        var h = domUtils.findParentByTagName(start, [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6','blockquote','caption'], true);
+                        var h = domUtils.findParentByTagName(start, [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6','blockquote','caption','table'], true);
                         if (!h) {
                             me.document.execCommand('formatBlock', false, '<p>');
                             doSave = 1;
@@ -103,8 +103,6 @@ UE.plugins['enterkey'] = function() {
                     return;
                 }
             }
-            me.currentSelectedArr && domUtils.clearSelectedArr(me.currentSelectedArr);
-
             if (tag == 'p') {
 
 
