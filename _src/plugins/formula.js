@@ -81,30 +81,31 @@ UE.plugins['insertformula'] = function () {
     }
 
     me.addListener("beforegetcontent beforegetscene", function () {
-        me._MathJaxEleList = getEleByClsName(this.document, 'MathJax');
-        if (me._MathJaxEleList.length) {
-            utils.each(me._MathJaxEleList, function (di) {
+        me._MathJaxEleList = [];
+        var list = getEleByClsName(this.document, 'MathJax');
+        utils.each(list, function (di) {
+            me._MathJaxEleList.push(di.cloneNode(true));
+        });
+
+        if (list.length) {
+            utils.each(list, function (di) {
                 var str = [];
                 var span = di.cloneNode(false);
                 str.push(decodeURIComponent(di.getAttribute('data')));
                 span.appendChild(me.document.createTextNode(str.join('\n')));
 
-                di.insertBefore(span);
-                domUtils.remove(di,false);
-                debugger;
-//                di.parentNode.replaceChild(span, di);
+                di.parentNode.replaceChild(span, di);
             });
         }
     });
 
 
     me.addListener("aftergetcontent aftersetcontent aftergetscene", function () {
-        me._MathJaxTxtList = getEleByClsName(me.document, 'MathJax');
-        if (me._MathJaxTxtList.length) {
+        var list = getEleByClsName(me.document, 'MathJax');
+        if (list.length) {
             var i = 0;
-            utils.each(me._MathJaxTxtList, function (di) {
-                di.parentNode.replaceChild(me._MathJaxEleList[i], di);
-                i++;
+            utils.each(list, function (di) {
+                di.parentNode.replaceChild(me._MathJaxEleList[i++], di);
             });
         }
     });
