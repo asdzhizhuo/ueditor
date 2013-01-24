@@ -128,7 +128,7 @@ UE.plugins['insertformula'] = function () {
                 'script.type = "text/javascript";'+
                 'script.src  = "'+src+'";'+
                 'document.getElementsByTagName("head")[0].appendChild(script);'+
-                'debugger;document.head.removeChild(document.getElementById("formula"));'+
+                'document.head.removeChild(document.getElementById("formula"));'+
                 '},2000)'+
                 '}'+
             '</script>';
@@ -138,10 +138,6 @@ UE.plugins['insertformula'] = function () {
             utils.each(list, function (di) {
                 domUtils.removeAttributes(di,["class","data","id"]);
             });
-        }
-        var tmpNode = me.document.getElementById('formula');
-        if (tmpNode) {
-            domUtils.remove(tmpNode);
         }
         coreHtml && headHtml.push(coreHtml);
     });
