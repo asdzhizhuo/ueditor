@@ -119,24 +119,24 @@ UE.plugins['insertformula'] = function () {
 //        }
 //    });
 
-    me.addListener('getAllHtml', function (type, headHtml){
-        var src= me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js?config=TeX-AMS_HTML';
-        var coreHtml = '<script  type="text/javascript">'+
-                'window.onload = function () {'+
-                '  setTimeout(function () {'+
-                ' var script = document.createElement("script");'+
-                'script.type = "text/javascript";'+
-                'script.src  = "'+src+'";'+
-                'document.getElementsByTagName("head")[0].appendChild(script);'+
-                'document.head.removeChild(document.getElementById("formula"));'+
-                '},2000)'+
-                '}'+
+    me.addListener('getAllHtml', function (type, headHtml) {
+        var src = me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js?config=default';
+        var coreHtml = '<script  type="text/javascript">' +
+            'window.onload = function () {' +
+            ' setTimeout(function () {' +
+            ' var script = document.createElement("script");' +
+            'script.type = "text/javascript";' +
+            'script.src  = "' + src + '";' +
+            'document.getElementsByTagName("head")[0].appendChild(script);' +
+            'document.head.removeChild(document.getElementById("formula"));' +
+            '},2000)' +
+            '}' +
             '</script>';
 
         var list = getEleByClsName(me.document, 'MathJax');
         if (list.length) {
             utils.each(list, function (di) {
-                domUtils.removeAttributes(di,["class","data","id"]);
+                domUtils.removeAttributes(di, ["class", "data", "id"]);
             });
         }
         coreHtml && headHtml.push(coreHtml);
