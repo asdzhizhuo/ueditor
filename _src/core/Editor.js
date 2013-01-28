@@ -500,9 +500,12 @@
                 });
 
             }
-            return '<html><head>' + (me.options.charset ? '<meta http-equiv="Content-Type" content="text/html; charset=' + me.options.charset + '"/>' : '')
+            var tmpHtml= '<html><head>' + (me.options.charset ? '<meta http-equiv="Content-Type" content="text/html; charset=' + me.options.charset + '"/>' : '')
                 + (headHtmlForIE9 || me.document.getElementsByTagName( 'head' )[0].innerHTML) + headHtml.join('\n') + '</head>'
-                    + '<body ' + (ie && browser.version < 9 ? 'class="view"' : '') + '>' + me.getContent( null, null, true ) + '</body></html>';
+                + '<body ' + (ie && browser.version < 9 ? 'class="view"' : '') + '>' + me.getContent( null, null, true ) + '</body></html>';
+            me.fireEvent( 'aftergetAllHtml');
+
+            return tmpHtml;
         },
         /**
          * 得到编辑器的纯文本内容，但会保留段落格式

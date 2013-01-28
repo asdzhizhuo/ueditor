@@ -109,36 +109,22 @@ UE.plugins['insertformula'] = function () {
         }
     });
 
-
-//    //避免table插件对于代码高亮的影响
-//    me.addListener('excludetable excludeNodeinautotype', function (cmd, target) {
-//        if (target && domUtils.findParent(target, function (node) {
-//            return node.tagName == '' && domUtils.hasClass(node, 'syntaxhighlighter');
-//        }, true)) {
-//            return true;
-//        }
-//    });
-
-    me.addListener('getAllHtml', function (type, headHtml) {
-        var src = me.options.formulaJsUrl || me.options.UEDITOR_HOME_URL + 'third-party/MathJax/MathJax.js?config=default';
-        var coreHtml = '<script  type="text/javascript">' +
-            'window.onload = function () {' +
-            ' setTimeout(function () {' +
-            ' var script = document.createElement("script");' +
-            'script.type = "text/javascript";' +
-            'script.src  = "' + src + '";' +
-            'document.getElementsByTagName("head")[0].appendChild(script);' +
-            'document.head.removeChild(document.getElementById("formula"));' +
-            '},2000)' +
-            '}' +
-            '</script>';
-
-        var list = getEleByClsName(me.document, 'MathJax');
+    function convert(clsName) {
+        var list = getEleByClsName(me.document, clsName);
         if (list.length) {
             utils.each(list, function (di) {
-                domUtils.removeAttributes(di, ["class", "data", "id"]);
+                domUtils.removeClasses(di, clsName);
+                clsName =/^_/.test(clsName) ? clsName.replace("_", "") : ("_" + clsName);
+                domUtils.addClass(di, clsName);
             });
         }
-        coreHtml && headHtml.push(coreHtml);
+    }
+
+    me.addListener('getAllHtml', function () {
+        convert("MathJax");
+    });
+
+    me.addListener('aftergetAllHtml', function () {
+        convert("_MathJax");
     });
 };

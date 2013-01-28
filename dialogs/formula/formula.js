@@ -86,16 +86,14 @@ function getStyle() {
 dialog.onok = function () {
     var textValue = textEditor.value.replace(/(^\s*)|(\s*$)/g, '');
     if (textValue.length > 0) {
-        var mathjaxDom = $G('result-area').lastChild;
-        if (!mathjaxDom) {
-            alert("公式还没渲染好!");
-            return;
-        }
-        do {
-            mathjaxDom = mathjaxDom.previousSibling;
-        }
-        while (mathjaxDom && mathjaxDom.className != 'MathJax_Display');
-        mathjaxDom.firstChild.setAttribute("data", encodeURIComponent("$$"+textValue+"$$"));
-        editor.execCommand('insertformula', mathjaxDom.innerHTML, getStyle());
+            var mathjaxDom = $G('result-area').lastChild;
+            do {
+                mathjaxDom = mathjaxDom.previousSibling;
+            }
+            while (mathjaxDom && mathjaxDom.className != 'MathJax_Display');
+            var node=mathjaxDom.firstChild;
+            node.removeAttribute("id");
+            node.setAttribute("data", encodeURIComponent("$$"+textValue+"$$"));
+            editor.execCommand('insertformula', mathjaxDom.innerHTML, getStyle());
     }
 };
