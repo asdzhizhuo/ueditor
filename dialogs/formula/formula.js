@@ -30,10 +30,11 @@ window.onload = function () {
         }
     };
     if (editor.queryCommandState("insertformula")) {
-        var ele = domUtils.findParent(editor.selection.getRange().startContainer, function (node) {
-            return node.className === 'math-container';
-        });
-        textEditor.value = decodeURIComponent(ele.getAttribute('data'));
+        var range = editor.selection.getRange(),
+            ele = domUtils.findParent(range.startContainer, function (node) {
+                return node.nodeType == 1 && node.tagName.toLowerCase() == 'span' && domUtils.hasClass(node, 'MathJax')
+            }, true);
+        textEditor.value = decodeURIComponent(ele.getAttribute('data')).replace(/\$/ig, "");
         updateFormula(textEditor.value)
     }
 };
@@ -86,14 +87,14 @@ function getStyle() {
 dialog.onok = function () {
     var textValue = textEditor.value.replace(/(^\s*)|(\s*$)/g, '');
     if (textValue.length > 0) {
-            var mathjaxDom = $G('result-area').lastChild;
-            do {
-                mathjaxDom = mathjaxDom.previousSibling;
-            }
-            while (mathjaxDom && mathjaxDom.className != 'MathJax_Display');
-            var node=mathjaxDom.firstChild;
-            node.removeAttribute("id");
-            node.setAttribute("data", encodeURIComponent("$$"+textValue+"$$"));
-            editor.execCommand('insertformula', mathjaxDom.innerHTML, getStyle());
+        var mathjaxDom = $G('result-area').lastChild;
+        do {
+            mathjaxDom = mathjaxDom.previousSibling;
+        }
+        while (mathjaxDom && mathjaxDom.className != 'MathJax_Display');
+        var node = mathjaxDom.firstChild;
+        node.removeAttribute("id");
+        node.setAttribute("data", encodeURIComponent("$$" + textValue + "$$"));
+        editor.execCommand('formula', mathjaxDom.innerHTML, getStyle());
     }
 };

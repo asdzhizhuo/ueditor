@@ -5,12 +5,38 @@
 ///commandsTitle  插入公式
 ///commandsDialog  dialogs\formula\formula.html
 
-UE.plugins['insertformula'] = function () {
+UE.plugins['formula'] = function () {
     var me = this;
-    me.commands['insertformula'] = {
+    me.commands['formula'] = {
         execCommand:function (cmdName, html, css) {
-            if (html.length)    me.execCommand('inserthtml', html);
-            if (css.length)    utils.cssRule('formula', css, me.document);
+            var range = me.selection.getRange();
+            range.adjustmentBoundary();
+            var start = domUtils.findParent(range.startContainer, function (node) {
+                    return node.nodeType == 1 && node.tagName.toLowerCase() == 'span' && domUtils.hasClass(node, 'MathJax')
+                }, true),
+                end = domUtils.findParent(range.endContainer, function (node) {
+                    return node.nodeType == 1 && node.tagName.toLowerCase() == 'span' && domUtils.hasClass(node, 'MathJax')
+                }, true);
+
+            if (start && end && start === end) {
+                if (start.nextSibling) {
+                    range.setStart(start.nextSibling, 0)
+                } else {
+                    if (start.previousSibling) {
+                        range.setStartAtLast(start.previousSibling)
+                    } else {
+                        var p = me.document.createElement('p');
+                        domUtils.fillNode(me.document, p);
+                        range.setStart(p, 0)
+                    }
+                }
+                range.setCursor(false, true);
+                domUtils.remove(start);
+            }
+            if (html && css) {
+                me.execCommand('inserthtml', html);
+                utils.cssRule('formula', css, me.document);
+            }
         },
         queryCommandState:function () {
             return queryState.call(this);
@@ -46,7 +72,8 @@ UE.plugins['insertformula'] = function () {
         pasteplain:1,
         preview:1,
         insertparagraph:1,
-        elementpath:1
+        elementpath:1,
+        formula:1
     };
     //将queyCommamndState重置
     var orgQuery = me.queryCommandState;
@@ -57,9 +84,6 @@ UE.plugins['insertformula'] = function () {
         return orgQuery.apply(this, arguments)
     };
 
-    me.addListener('beforeselectionchange afterselectionchange', function (type) {
-        me.formula = /^b/.test(type) ? me.queryCommandState('insertformula') : 0;
-    });
     function getEleByClsName(cxt, clsName) {
         if (!cxt.getElementsByClassName) {
             var clsArr = [];
