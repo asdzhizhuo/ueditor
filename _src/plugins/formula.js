@@ -9,12 +9,8 @@ UE.plugins['insertformula'] = function () {
     var me = this;
     me.commands['insertformula'] = {
         execCommand:function (cmdName, html, css) {
-            if (html.length > 0) {
-                me.execCommand('inserthtml', html);
-            }
-            if (css.length > 0) {
-                utils.cssRule('formula', css, me.document);
-            }
+            if (html.length)    me.execCommand('inserthtml', html);
+            if (css.length)    utils.cssRule('formula', css, me.document);
         },
         queryCommandState:function () {
             return queryState.call(this);
@@ -114,7 +110,7 @@ UE.plugins['insertformula'] = function () {
         if (list.length) {
             utils.each(list, function (di) {
                 domUtils.removeClasses(di, clsName);
-                clsName =/^_/.test(clsName) ? clsName.replace("_", "") : ("_" + clsName);
+                clsName = /^_/.test(clsName) ? clsName.replace("_", "") : ("_" + clsName);
                 domUtils.addClass(di, clsName);
             });
         }
