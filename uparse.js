@@ -175,6 +175,7 @@ function uParse(selector,opt){
     var defaultOption ={
         liiconpath : 'http://bs.baidu.com/listicon/',
         listDefaultPaddingLeft : '20',
+        'formulaUrl':'',
         'highlightJsUrl':'',
         'highlightCssUrl':''
     };
@@ -321,6 +322,20 @@ function uParse(selector,opt){
                         });
                     }
 
+                },
+                'span':function(nodes){
+                    loadFile(document,{
+                        src : defaultOption.formulaUrl,
+                        tag : "script",
+                        type : "text/javascript",
+                        defer : "defer"
+                    },function(){
+                        _each(nodes,function(pi){
+                            if(/MathJax/i.test(pi.className)){
+                                pi.removeAttribute("class");
+                            }
+                        });
+                    });
                 }
             };
             //先插入默认的属性
