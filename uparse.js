@@ -324,18 +324,21 @@ function uParse(selector,opt){
 
                 },
                 'span':function(nodes){
-                    loadFile(document,{
-                        src : defaultOption.formulaUrl,
-                        tag : "script",
-                        type : "text/javascript",
-                        defer : "defer"
-                    },function(){
-                        _each(nodes,function(pi){
-                            if(/MathJax/i.test(pi.className)){
-                                pi.removeAttribute("class");
-                            }
-                        });
+                    var flag=false;
+                    _each(nodes,function(pi){
+                        if(/MathJax/i.test(pi.className)){
+                            pi.removeAttribute("class");
+                            flag=true;
+                        }
                     });
+                    if(flag){
+                        loadFile(document,{
+                            src : defaultOption.formulaUrl,
+                            tag : "script",
+                            type : "text/javascript",
+                            defer : "defer"
+                        });
+                    }
                 }
             };
             //先插入默认的属性
