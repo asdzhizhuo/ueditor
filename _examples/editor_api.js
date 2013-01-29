@@ -22,7 +22,6 @@
             'plugins/justify.js',
             'plugins/font.js',
             'plugins/link.js',
-            'plugins/map.js',
             'plugins/iframe.js',
             'plugins/scrawl.js',
             'plugins/removeformat.js',
@@ -40,7 +39,6 @@
             'plugins/lineheight.js',
             'plugins/cleardoc.js',
             'plugins/anchor.js',
-            'plugins/delete.js',
             'plugins/wordcount.js',
             'plugins/pagebreak.js',
             'plugins/wordimage.js',
@@ -48,7 +46,6 @@
             'plugins/paste.js',           //粘贴时候的提示依赖了UI
             'plugins/list.js',
             'plugins/source.js',
-            'plugins/shortcutkeys.js',
             'plugins/enterkey.js',
             'plugins/keystrokes.js',
             'plugins/fiximgclick.js',

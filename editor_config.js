@@ -68,7 +68,7 @@
         ,snapscreenServerUrl: URL +"php/imageUp.php" //屏幕截图的server端保存程序，UEditor的范例代码为“URL +"server/upload/php/snapImgUp.php"”
         ,snapscreenPath: URL + "php/"
         //,snapscreenServerPort: 80                                    //屏幕截图的server端端口
-        //,snapscreenImgAlign: 'center'                                //截图的图片默认的排版方式
+        //,snapscreenImgAlign: ''                                //截图的图片默认的排版方式
 
         //word转存配置区
         ,wordImageUrl:URL + "php/imageUp.php"             //word转存提交地址
@@ -106,7 +106,7 @@
         //,langPath:URL +"lang/"
 
         //主题配置项,默认是default。有需要的话也可以使用如下这样的方式来自动多主题切换，当然，前提条件是themes文件夹下存在对应的主题文件：
-        //现有如下皮肤:default,modern,gorgeous
+        //现有如下皮肤:default
         //,theme:'default'
         //,themePath:URL +"themes/"
 
@@ -121,7 +121,7 @@
 
         //,initialContent:'欢迎使用ueditor!'    //初始化编辑器的内容,也可以通过textarea/script给值，看官网例子
 
-        //,initialFrameWidth:1000  //初始化编辑器宽度,默认1000
+        //,initialFrameWidth:1000  //初始化编辑器宽度,1000，同时支持百分比，例如："70%"
         //,initialFrameHeight:320  //初始化编辑器高度,默认320
 
         //,autoClearinitialContent:true //是否自动清除编辑器初始内容，注意：如果focus属性设置为true,这个也为真，那么编辑器一上来就会触发导致初始化的内容看不到了
@@ -158,6 +158,14 @@
         //insertorderedlist
         //有序列表的下拉配置,值留空时支持多语言自动识别，若配置值，则以此值为准
 //        ,'insertorderedlist':{
+//              //自定的样式
+//                'num':'1,2,3...',
+//                'num1':'1),2),3)...',
+//                'num2':'(1),(2),(3)...',
+//                'cn':'一,二,三....',
+//                'cn1':'一),二),三)....',
+//                'cn2':'(一),(二),(三)....',
+//             //系统自带
 //             'decimal' : '' ,         //'1,2,3...'
 //             'lower-alpha' : '' ,    // 'a,b,c...'
 //             'lower-roman' : '' ,    //'i,ii,iii...'
@@ -168,11 +176,17 @@
         //insertunorderedlist
         //无序列表的下拉配置，值留空时支持多语言自动识别，若配置值，则以此值为准
         //,insertunorderedlist : {
+        //              //自定的样式
+//        'dash' :'— 破折号',
+//        'dot':' 。 小圆圈'
+//             //系统自带
         //    'circle' : '',  // '○ 小圆圈'
         //    'disc' : '',    // '● 小圆点'
         //    'square' : ''   //'■ 小方块'
         //}
-
+//        ,listDefaultPaddingLeft : '30'//默认的左边缩进的基数倍
+//        ,listiconpath : 'http://bs.baidu.com/listicon/'//自定义标号的路径
+//        ,maxListLevel : 3 //限制可以tab的级数-1不限制
         //fontfamily
         //字体设置 label留空支持多语言自动切换，若配置，则以配置值为准
 //        ,'fontfamily':[

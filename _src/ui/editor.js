@@ -81,6 +81,8 @@
 
             var pastePop, isPaste = false, timer;
             editor.addListener("afterpaste", function () {
+                if(editor.queryCommandState('pasteplain'))
+                    return;
                 pastePop = new baidu.editor.ui.Popup({
                     content:new baidu.editor.ui.PastePicker({editor:editor}),
                     editor:editor,
@@ -184,9 +186,6 @@
                         case 1:
                             newFrame.setAttribute("align", "right");
                             break;
-                        case 2:
-                            newFrame.setAttribute("align", "middle");
-                            break;
                     }
                     frame.parentNode.insertBefore(newFrame, frame);
                     domUtils.remove(frame);
@@ -219,7 +218,6 @@
                     if (editor.ui._dialogs.insertframeDialog && /iframe/ig.test(el.tagName)) {
                         var html = popup.formatHtml(
                             '<nobr>' + editor.getLang("property") + ': <span onclick=$$._setIframeAlign(-2) class="edui-clickable">' + editor.getLang("default") + '</span>&nbsp;&nbsp;<span onclick=$$._setIframeAlign(-1) class="edui-clickable">' + editor.getLang("justifyleft") + '</span>&nbsp;&nbsp;<span onclick=$$._setIframeAlign(1) class="edui-clickable">' + editor.getLang("justifyright") + '</span>&nbsp;&nbsp;' +
-                                '<span onclick=$$._setIframeAlign(2) class="edui-clickable">' + editor.getLang("justifycenter") + '</span>' +
                                 ' <span onclick="$$._updateIframe( this);" class="edui-clickable">' + editor.getLang("modify") + '</span></nobr>');
                         if (html) {
                             popup.getDom('content').innerHTML = html;

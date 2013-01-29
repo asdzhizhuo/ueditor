@@ -1,4 +1,34 @@
-Ueditor Change List
+UEditor Change List
+
+Version 1.2.5
+新增功能
+  . table整体重构
+  . table支持插入表头和标题
+  . table支持拷贝
+  . table支持任意调整宽高
+  . table支持任意前插后插行列
+  . table键盘操作仿word用户体验
+  . 添加table平均分布行、列
+  . 添加table单元格对齐方式
+  . 添加table对齐方式
+  . 添加选中部分表格,点击backspace或delete删除功能
+  . 重写表格属性、单元格属性dialog
+  . 粘贴支持纯文本,源码,纯标签3个模式选择
+  . 添加计算字数的getContentLength接口
+  . 添加计算字数事件wordcount
+  . 图片上传支持参数动态绑定
+  . 重写了list功能，支持一,一),(一),1),(1),——等新的列表标签
+  . 调整了list中tab键的逻辑
+  . 添加了可以限制列表的层级
+  . 全屏快捷键 ALT+Z
+  . 添加了uparse.js展示页加载器
+
+优化修复
+  . 优化了插入代码功能
+  . ie下默认禁用源码模式下的代码高亮
+  . 截图功能支持非ie浏览器
+  . 修正了非ie下中文输入时回退不准确的问题
+  . 改进了键盘输入时做回退的操作
 
 Version 1.2.4
 新增功能

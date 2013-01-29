@@ -500,12 +500,9 @@
                 });
 
             }
-            var tmpHtml= '<html><head>' + (me.options.charset ? '<meta http-equiv="Content-Type" content="text/html; charset=' + me.options.charset + '"/>' : '')
+            return '<html><head>' + (me.options.charset ? '<meta http-equiv="Content-Type" content="text/html; charset=' + me.options.charset + '"/>' : '')
                 + (headHtmlForIE9 || me.document.getElementsByTagName( 'head' )[0].innerHTML) + headHtml.join('\n') + '</head>'
-                + '<body ' + (ie && browser.version < 9 ? 'class="view"' : '') + '>' + me.getContent( null, null, true ) + '</body></html>';
-            me.fireEvent( 'aftergetAllHtml');
-
-            return tmpHtml;
+                    + '<body ' + (ie && browser.version < 9 ? 'class="view"' : '') + '>' + me.getContent( null, null, true ) + '</body></html>';
         },
         /**
          * 得到编辑器的纯文本内容，但会保留段落格式
@@ -555,7 +552,8 @@
             html = html
                     .replace( /^[ \t\r\n]*?</, '<' )
                     .replace( />[ \t\r\n]*?$/, '>' )
-                    .replace( />[\t\r\n]*?</g, '><' )//代码高量的\n不能去除
+                    //ie有时的源码会有>&nbsp;<的情况
+                    .replace(/>(?:(\s|&nbsp;)*?)</g,'><' )//代码高量的\n不能去除
                     .replace( /[\s\/]?(\w+)?>[ \t\r\n]*?<\/?(\w+)/gi, function ( a, b, c ) {
                         if ( b ) {
                             lastTagName = c;
