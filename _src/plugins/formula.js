@@ -128,23 +128,4 @@ UE.plugins['formula'] = function () {
             });
         }
     });
-
-//    function convert(clsName) {
-//        var list = getEleByClsName(me.document, clsName);
-//        if (list.length) {
-//            utils.each(list, function (di) {
-//                domUtils.removeClasses(di, clsName);
-//                clsName = /^_/.test(clsName) ? clsName.replace("_", "") : ("_" + clsName);
-//                domUtils.addClass(di, clsName);
-//            });
-//        }
-//    }
-//
-//    me.addListener('getAllHtml', function () {
-//        convert("MathJax");
-//    });
-//
-//    me.addListener('aftergetAllHtml', function () {
-//        convert("_MathJax");
-//    });
 };
