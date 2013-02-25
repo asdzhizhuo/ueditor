@@ -7,6 +7,13 @@
 
 UE.plugins['formula'] = function () {
     var me = this;
+
+    me.addListener('ready', function () {
+        domUtils.on(me.body, "mousedown", function () {
+            var rng = me.selection.getRange();
+        });
+    });
+
     me.commands['formula'] = {
         execCommand:function (cmdName, html, css) {
             var range = me.selection.getRange();
