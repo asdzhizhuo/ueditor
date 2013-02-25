@@ -1,4 +1,5 @@
 var layoutWrap = $G('layout-wrap'),
+    resultArea= $G('result-area'),
     textEditor = $G('textarea'),
     bk;
 
@@ -29,6 +30,10 @@ window.onload = function () {
             updateFormula(textEditor.value);
         }
     };
+
+    //同步编辑器中的字体大小与公式一致
+    resultArea.style.fontSize=domUtils.getComputedStyle(editor.selection.getRange().startContainer,'font-size');
+
     if (editor.queryCommandState("insertformula")) {
         var range = editor.selection.getRange(),
             ele = domUtils.findParent(range.startContainer, function (node) {
@@ -87,7 +92,7 @@ function getStyle() {
 dialog.onok = function () {
     var textValue = textEditor.value.replace(/(^\s*)|(\s*$)/g, '');
     if (textValue.length > 0) {
-        var mathjaxDom = $G('result-area').lastChild;
+        var mathjaxDom =resultArea.lastChild;
         do {
             mathjaxDom = mathjaxDom.previousSibling;
         }
