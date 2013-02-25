@@ -108,12 +108,11 @@ UE.plugins['formula'] = function () {
         });
 
         if (list.length) {
-            var str = "";
             utils.each(list, function (di) {
                 var span = di.cloneNode(false);
-                str = decodeURIComponent(di.getAttribute('data'));
-                span.appendChild(me.document.createTextNode(str));
+                span.appendChild(me.document.createTextNode(decodeURIComponent(di.getAttribute('data'))));
                 di.parentNode.replaceChild(span, di);
+                span.removeAttribute('data');
             });
         }
     });
