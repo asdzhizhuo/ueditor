@@ -46,7 +46,7 @@ MathJax.Hub.Config({
     //  Example:    config: ["local/local.js"],
     //  Example:    config: ["local/local.js","MMLtoHTML.js"],
     //
-    config: ["TeX-AMS_HTML.js"],
+    config: [],
 
     //
     //  A comma-separated list of CSS stylesheet files to be loaded
