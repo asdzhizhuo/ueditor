@@ -17,18 +17,21 @@
     border: 0;
     cursor: pointer;
 }
+
 .symbol td:hover {
-    background-color: #a3bde3 ;
+    background-color: #a3bde3;
     opacity: 0.6;
     filter: alpha(opacity = 60);
 }
+
 #textarea {
     width: 98%;
     margin: 0 auto;
     display: block;
     overflow: auto;
 }
-.title{
+
+.title {
     margin: 5px 0 5px 10px;
 }
 
