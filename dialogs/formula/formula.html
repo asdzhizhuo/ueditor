@@ -15,7 +15,7 @@
 </head>
 
 <body>
-<table id="layout-wrap">
+<table id="layout-wrap" border="0" cellpadding="0" cellspacing="0">
     <tr>
         <td>
             <div class="symbol">
@@ -203,11 +203,16 @@
         </td>
     </tr>
     <tr>
-        <td colspan="2">公式输入：<br/><textarea id="textarea" rows="8"></textarea>
+        <td colspan="2">
+            <div class="title">公式输入：</div>
+            <textarea id="textarea" rows="8"></textarea>
         </td>
     </tr>
     <tr>
-        <td colspan="2" id="result-area">公式预览：<br/>$${}$$</td>
+        <td colspan="2">
+            <div class="title">公式预览：</div>
+            <div id="result-area">$${}$$</div>
+        </td>
     </tr>
 </table>
 <script type="text/javascript" src="formula.js"></script>
