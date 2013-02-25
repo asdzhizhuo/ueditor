@@ -1,7 +1,7 @@
-//ç¼–è¾‘å™¨å±•ç¤ºé¡µé¢å†…å®¹è§£æï¼ŒåŠ è½½èµ„æºå·¥å…·
+//±à¼­Æ÷Õ¹Ê¾Ò³ÃæÄÚÈİ½âÎö£¬¼ÓÔØ×ÊÔ´¹¤¾ß
 //by zhanyi
 function uParse(selector,opt){
-    //éœ€è¦çš„å·¥å…·æ–¹æ³•
+    //ĞèÒªµÄ¹¤¾ß·½·¨
     var ie = !!window.ActiveXObject,
         cssRule = ie ? function(key,style,doc){
             var indexList,index;
@@ -171,13 +171,13 @@ function uParse(selector,opt){
         }();
 
 
-    //é»˜è®¤çš„é…ç½®é¡¹ç›®
+    //Ä¬ÈÏµÄÅäÖÃÏîÄ¿
     var defaultOption ={
         liiconpath : 'http://bs.baidu.com/listicon/',
         listDefaultPaddingLeft : '20',
-        'formulaUrl':'',
         'highlightJsUrl':'',
-        'highlightCssUrl':''
+        'highlightCssUrl':'',
+        customRule:function(){}
     };
     if(opt){
         for(var p in opt){
@@ -185,15 +185,20 @@ function uParse(selector,opt){
         }
     }
     domReady(function(){
-        //å¤„ç†å®¹å™¨
+        //´¦ÀíÈİÆ÷
         var contents;
         if(document.querySelectorAll){
             contents = document.querySelectorAll(selector)
         }else{
             if(/^#/.test(selector)){
-                contents = [document.getElementById(selector)]
+                contents = [document.getElementById(selector.replace(/^#/,''))]
             }else if(/^\./.test(selector)){
-                contents = document.getElementsByClassName(selector)
+                var contents = [];
+                _each(document.getElementsByTagName('*'),function(node){
+                    if(node.className && new RegExp('\\b' + selector.replace(/^\./,'') + '\\b','i').test(node.className)){
+                        contents.push(node)
+                    }
+                })
             }else{
                 contents = document.getElementsByTagName(selector)
             }
@@ -277,15 +282,15 @@ function uParse(selector,opt){
                 customCss.push(selector +' .list-paddingleft-1{padding-left:0}');
                 customCss.push(selector +' .list-paddingleft-2{padding-left:'+defaultOption.listDefaultPaddingLeft+'px}');
                 customCss.push(selector +' .list-paddingleft-3{padding-left:'+defaultOption.listDefaultPaddingLeft*2+'px}');
-                //å¦‚æœä¸ç»™å®½åº¦ä¼šåœ¨è‡ªå®šåº”æ ·å¼é‡Œå‡ºç°æ»šåŠ¨æ¡
-                cssRule('list', selector +' ol,'+selector +' ul{margin:0;pading:0;}li{clear:both;}'+customCss.join('\n'), document);
+                //Èç¹û²»¸ø¿í¶È»áÔÚ×Ô¶¨Ó¦ÑùÊ½Àï³öÏÖ¹ö¶¯Ìõ
+                cssRule('list', selector +' ol,'+selector +' ul{margin:0;padding:0;}li{clear:both;}'+customCss.join('\n'), document);
             }
-            //è§£æå†…å®¹
+            //½âÎöÄÚÈİ
             var needParseTagName = {
                 'table' : function(){
                     cssRule('table',
                         selector +' table.noBorderTable td,'+selector+' table.noBorderTable th,'+selector+' table.noBorderTable caption{border:1px dashed #ddd !important}' +
-                            //æ’å…¥çš„è¡¨æ ¼çš„é»˜è®¤æ ·å¼
+                            //²åÈëµÄ±í¸ñµÄÄ¬ÈÏÑùÊ½
                             selector +' table{margin-bottom:10px;border-collapse:collapse;display:table;}' +
                             selector +' td,'+selector+' th{ background:white; padding: 5px 10px;border: 1px solid #DDD;}' +
                             selector +' caption{border:1px dashed #DDD;border-bottom:0;padding:3px;text-align:center;}' +
@@ -296,7 +301,7 @@ function uParse(selector,opt){
                 'ol' : checkList,
                 'ul' : checkList,
                 'pre': function(nodes){
-                    //é¿å…é‡å¤åŠ è½½é«˜äº®æ–‡ä»¶
+                    //±ÜÃâÖØ¸´¼ÓÔØ¸ßÁÁÎÄ¼ş
                     if(typeof XRegExp == "undefined"){
                         loadFile(document,{
                             id : "syntaxhighlighter_js",
@@ -308,6 +313,18 @@ function uParse(selector,opt){
                             _each(nodes,function(pi){
                                 if(/brush/i.test(pi.className)){
                                     SyntaxHighlighter.highlight(pi);
+                                    var tables = document.getElementsByTagName('table');
+                                       for(var t= 0,ti;ti=tables[t++];){
+                                           if(/SyntaxHighlighter/i.test(ti.className)){
+                                               var tds = ti.getElementsByTagName('td');
+                                               for(var i=0,li,ri;li=tds[0].childNodes[i];i++){
+                                                   ri = tds[1].firstChild.childNodes[i];
+                                                   if(ri){
+                                                      ri.style.height = li.style.height = ri.offsetHeight + 'px';
+                                                   }
+                                               }
+                                           }
+                                       }
                                 }
                             });
                         });
@@ -322,26 +339,9 @@ function uParse(selector,opt){
                         });
                     }
 
-                },
-                'span':function(nodes){
-                    var flag=false;
-                    _each(nodes,function(pi){
-                        if(/MathJax/i.test(pi.className)){
-                            pi.removeAttribute("class");
-                            flag=true;
-                        }
-                    });
-                    if(flag){
-                        loadFile(document,{
-                            src : defaultOption.formulaUrl,
-                            tag : "script",
-                            type : "text/javascript",
-                            defer : "defer"
-                        });
-                    }
                 }
             };
-            //å…ˆæ’å…¥é»˜è®¤çš„å±æ€§
+            //ÏÈ²åÈëÄ¬ÈÏµÄÊôĞÔ
 
             for(var tag in needParseTagName){
                 var nodes = content.getElementsByTagName(tag);
@@ -349,7 +349,9 @@ function uParse(selector,opt){
                     needParseTagName[tag](nodes)
                 }
             }
-        })
+            defaultOption.customRule(content);
+        });
+
 
 
     })
