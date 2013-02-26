@@ -11,6 +11,15 @@ UE.plugins['formula'] = function () {
     me.addListener('ready', function () {
         domUtils.on(me.body, "mousedown", function () {
             var rng = me.selection.getRange();
+            var start=domUtils.findParent(rng.startContainer, function (node) {
+                return node.nodeType == 1 && node.tagName.toLowerCase() == 'span' && domUtils.hasClass(node, 'MathJax')
+            }, true);
+
+            if(start&&rng.startContainer.nodeValue==""){
+                rng.startContainer=start;
+                rng.endContainer=start;
+                rng.setCursor(true);
+            }
         });
     });
 
