@@ -75,6 +75,7 @@
             'plugins/webapp.js',
             'plugins/template.js',
             'plugins/music.js',
+            'plugins/revision.js',
             'ui/ui.js',
             'ui/uiutils.js',
             'ui/uibase.js',
