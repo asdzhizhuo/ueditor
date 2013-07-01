@@ -35,6 +35,42 @@ UE.plugins['revision'] = function () {
         return orgQuery.apply (this , arguments)
     };
 
+    function getDomNode (node , start , ltr , startFromChild , fn , guard) {
+        var tmpNode = startFromChild && node[start],
+            parent;
+        !tmpNode && (tmpNode = node[ltr]);
+        while (!tmpNode && (parent = (parent || node).parentNode)) {
+            if (parent.tagName == 'BODY' || guard && !guard (parent)) {
+                return null;
+            }
+            tmpNode = parent[ltr];
+        }
+        if (tmpNode && fn && !fn (tmpNode)) {
+            return  getDomNode (tmpNode , start , ltr , false , fn);
+        }
+        return tmpNode;
+    }
+
+    //获取兄弟上下节点
+    function getNearNode (node) {
+        var filter = function (ltr) {
+            return getDomNode (node , 'firstChild' , ltr , false , function (ele) {
+                return  ele && domUtils.hasClass (ele , "line-through");
+            })
+        }, tmp;
+
+        if (tmp = filter ("previousSibling")) {
+            return {
+                node : tmp ,
+                ltr : "previousSibling"
+            };
+        } else {
+            return {
+                node : filter ("nextSibling") ,
+                ltr : "nextSibling"
+            };
+        }
+    }
 
     me.addListener ('keydown' , function (type , evt) {
         var keyCode = evt.keyCode || evt.which;
@@ -45,19 +81,33 @@ UE.plugins['revision'] = function () {
                 if (rng.startOffset == 0)  return;
 
                 var node = rng.startContainer;
+
                 while (node && node.nodeType != 3) {
                     node = node.lastChild;
                 }
+
                 if (node && node.nodeType == 3) {
-                    var str = node.innerText || node.textContent || node.value;
-                    var newNode = domUtils.createElement (me.document , "span" , {
-                        style : 'text-decoration: line-through;'
-                    });
-                    newNode.innerHTML += str.substring (rng.startOffset - 1 , rng.startOffset);
-                    setTimeout(function(){
-                        me.execCommand("inserthtml",newNode.outerHTML);
-                    });
+                    var obj = getNearNode (node),
+                        newNode = obj.node,
+                        char = (node.innerText || node.textContent || node.value).substring (rng.startOffset - 1 , rng.startOffset);
+
+                    if (!newNode) {
+                        newNode = domUtils.createElement (me.document , "span" , {
+                            class : 'line-through' ,
+                            style : 'text-decoration: line-through;'
+                        });
+
+                        rng.insertNode (newNode);
+                    }
+
+                    if (obj.ltr == "previousSibling") {
+                        newNode.innerHTML = char + newNode.innerHTML;
+                    } else {
+                        newNode.innerHTML = char + newNode.innerHTML;
+                    }
+
                 }
+
             } else {
                 rng.applyInlineStyle ("span" , {'style' : 'text-decoration: line-through;'})
                     .select ();
