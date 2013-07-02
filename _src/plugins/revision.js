@@ -48,6 +48,13 @@ UE.plugins['revision'] = function () {
         if (tmpNode && fn && !fn (tmpNode)) {
             return  getDomNode (tmpNode , start , ltr , false , fn);
         }
+
+        var rng=me.selection.getRange();
+        if(rng.startOffset==1){
+
+        }else if(rng.startOffset==tmpNode.length){
+
+        }
         return tmpNode;
     }
 
@@ -100,9 +107,7 @@ UE.plugins['revision'] = function () {
                         rng.insertNode (newNode);
                     }
 
-                    if (obj.ltr == "previousSibling") {
-                        newNode.innerHTML = char + newNode.innerHTML;
-                    } else {
+                    if (obj.ltr) {
                         newNode.innerHTML = char + newNode.innerHTML;
                     }
 
